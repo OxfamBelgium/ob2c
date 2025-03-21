@@ -15,7 +15,6 @@
 	);
 	
 	$allowed_domains = array(
-		'https://www.oxfamwereldwinkels.be',
 		'https://shop.oxfamwereldwinkels.be',
 		'https://www.oxfamfairtrade.be',
 		'https://apps.oxfamwereldwinkels.be',
@@ -35,7 +34,7 @@
 	} elseif ( in_array( $_SERVER['REMOTE_ADDR'], $allowed_ips ) or ( isset( $_POST['import_key'] ) and $_POST['import_key'] === IMPORT_KEY ) ) {
 		
 		// Ofwel komt de request via PHP vanaf een toegelaten IP-adres EN/OF met de juiste parameter
-		// POST-data over HTTPS wordt geëncrypteerd, dus afscherming geheime parameter is in orde 
+		// POST-data over HTTPS wordt geëncrypteerd, dus afscherming geheime parameter is in orde
 		
 	} else {
 		
@@ -112,7 +111,7 @@
 			}
 		} else {
 			$language = '';
-		}		 		
+		}
 		
 		if ( isset( $_POST['list_id'] ) ) {
 			$list_id = $_POST['list_id'];
@@ -127,14 +126,14 @@
 			case '5cce3040aa':
 				// GDPR-permissie 'maandelijkse nieuwsbrief' activeren, tenzij expliciet geweigerd
 				if ( ! ( isset( $_POST['digizine'] ) and $_POST['digizine'] === 'no' ) ) {
-					$settings['marketing_permissions'][] = array( 
+					$settings['marketing_permissions'][] = array(
 						'marketing_permission_id' => '496c25fb49',
 						'enabled' => true,
 					);
 				}
 				// GDPR-permissie 'commerciële berichten' activeren
 				if ( isset( $_POST['marketing'] ) and $_POST['marketing'] === 'yes' ) {
-					$settings['marketing_permissions'][] = array( 
+					$settings['marketing_permissions'][] = array(
 						'marketing_permission_id' => 'c1cbf23458',
 						'enabled' => true,
 					);
@@ -145,7 +144,7 @@
 			case '66358ad206':
 				// GDPR-permissie 'scholennieuwsbrief' activeren, tenzij expliciet geweigerd
 				if ( ! ( isset( $_POST['scholennieuwsbrief'] ) and $_POST['scholennieuwsbrief'] === 'no' ) ) {
-					$settings['marketing_permissions'][] = array( 
+					$settings['marketing_permissions'][] = array(
 						'marketing_permission_id' => '95c61bd28f',
 						'enabled' => true,
 					);
@@ -155,7 +154,7 @@
 			// Oxfam Fair Trade B2B
 			case '5c591564e3':
 				// GDPR-permissie 'Email' altijd activeren
-				$settings['marketing_permissions'][] = array( 
+				$settings['marketing_permissions'][] = array(
 					'marketing_permission_id' => '304ac42a1d',
 					'enabled' => true,
 				);
@@ -341,7 +340,7 @@
 		
 		// Stel alle tags in op de abonnee
 		foreach ( $segment_ids as $segment_id ) {
-			// Tag toevoegen door abonnee in statisch segment te stoppen 
+			// Tag toevoegen door abonnee in statisch segment te stoppen
 			$tag = $MailChimp->post( 'lists/'.$list_id.'/segments/'.$segment_id, array(
 				'members_to_add' => array( $email ),
 			) );

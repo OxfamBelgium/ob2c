@@ -36,7 +36,7 @@
 					echo '</div>';
 				}
 				
-				// Er werden twee geschenkverpakkingen toegevoegd: een geschenkmand (servicekost: 3,95 euro, enkel afhaling) en een geschenkdoos (servicekost: 2,50 euro, ook thuislevering). Door minstens één product op voorraad te zetten activeer je de module. Onder het winkelmandje verschijnt dan een opvallende knop om een geschenkverpakking toe te voegen. <a href="https://github.com/OxfamFairTrade/ob2c/wiki/9.-Lokaal-assortiment#geschenkverpakkingen" target="_blank">Raadpleeg de handleiding voor info over de werking en hoe je zelf geschenkverpakkingen kunt aanmaken met andere prijzen/voorwaarden.</a> Opmerking: indien je thuislevering van breekbare goederen inschakelde onder <a href="admin.php?page=oxfam-options">Winkelgegevens</a> kan de geschenkmand ook thuisgeleverd worden.
+				// Er werden twee geschenkverpakkingen toegevoegd: een geschenkmand (servicekost: 3,95 euro, enkel afhaling) en een geschenkdoos (servicekost: 2,50 euro, ook thuislevering). Door minstens één product op voorraad te zetten activeer je de module. Onder het winkelmandje verschijnt dan een opvallende knop om een geschenkverpakking toe te voegen. <a href="https://github.com/OxfamBelgium/ob2c/wiki/9.-Lokaal-assortiment#geschenkverpakkingen" target="_blank">Raadpleeg de handleiding voor info over de werking en hoe je zelf geschenkverpakkingen kunt aanmaken met andere prijzen/voorwaarden.</a> Opmerking: indien je thuislevering van breekbare goederen inschakelde onder <a href="admin.php?page=oxfam-options">Winkelgegevens</a> kan de geschenkmand ook thuisgeleverd worden.
 				if ( '' !== ( $info = get_site_option( 'oxfam_shop_dashboard_notice_info', '' ) ) ) {
 					echo '<div class="notice notice-info">';
 						echo '<p>' . stripslashes( $info ) . '</p>';
@@ -69,7 +69,7 @@
 				}
 				
 				$replaced_skus = get_site_option( 'oxfam_shop_dashboard_notice_replaced_products', array() );
-				if ( count( $replaced_skus ) > 0 ) {	
+				if ( count( $replaced_skus ) > 0 ) {
 					echo '<div class="notice notice-success">';
 						echo '<p>Volgende referenties vervangen een bestaand product (met ongewijzigde verpakking):</p><ul style="margin-left: 2em; column-count: 2;">';
 							foreach ( $replaced_skus as $old_new ) {
@@ -139,7 +139,7 @@
 				// 			}
 				// 		}
 				// 	echo '</ul></li>';
-				// 	
+				//
 				// 	echo '<li>Nieuwe verzorgingsproducten:<ul style="margin-left: 2em; column-count: 2;">';
 				// 		$skus = array( 45247, 45258, 45262, 45267, 45390, 65200, 65202, 65204, 65205, 65207, 65208, 65209, 65215, 65228, 65229, 65269, 65270, 65273, 65274, 87359, 87360, 87361 );
 				// 		foreach ( $skus as $sku ) {
@@ -150,7 +150,7 @@
 				// 			}
 				// 		}
 				// 	echo '</ul></li>';
-				// 	
+				//
 				// 	echo '<li>Nieuwe onderhoudsproducten:<ul style="margin-left: 2em; column-count: 2;">';
 				// 		$skus = array( 87309, 87312, 87351, 80282, 80283, 80306, 80313, 80314, 80315 );
 				// 		foreach ( $skus as $sku ) {
@@ -161,7 +161,7 @@
 				// 			}
 				// 		}
 				// 	echo '</ul></li>';
-				// 	
+				//
 				// 	echo '<li>Nieuwe Dopper-drinkflessen:<ul style="margin-left: 2em; column-count: 2;">';
 				// 		$skus = array( 12374, 12375, 12376, 12377, 12378, 12379, 12380, 12381 );
 				// 		foreach ( $skus as $sku ) {
