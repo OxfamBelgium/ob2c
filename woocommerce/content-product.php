@@ -56,6 +56,7 @@ if ( ! $nm_theme_options['product_action_link'] ) {
             $koffieroom = wc_get_product( wc_get_product_id_by_sku('24128') );
             $mais = wc_get_product( wc_get_product_id_by_sku('24129') );
             $term_link = get_term_link( 'koffie', 'product_cat' );
+            write_log( $woocommerce_loop['name'] );
         ?>
         
         <?php if ( $woocommerce_loop['name'] === '' and $koffieroom !== false and $mais !== false and ( $koffieroom->get_stock_status() === 'instock' or $mais->get_stock_status() === 'instock' ) ) : ?>
