@@ -1,14 +1,20 @@
+// Dirty fixes voor niet correct verschijnende sliders op homepages
+.page-template-local-homepage {
+  .nm-product-slider {
+    .nm-products {
+      opacity: 1 !important;
+      max-height: initial !important;
+      overflow: initial !important;
+    }
+  }
+}
+
 
 
 // Product slider
 // --------------------------------------------------
 
 .nm-product-slider {
-  // Dirty fix voor niet-verschijnende sliders op homepage
-  .nm-products {
-    opacity: 1 !important;
-  }
-  
   .slick-dots {
     padding: 1em;
 
