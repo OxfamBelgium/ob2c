@@ -57,7 +57,7 @@ if ( ! $nm_theme_options['product_action_link'] ) {
         ?>
         
         <?php if ( $koffieroom !== false and $mais !== false and ( $koffieroom->get_stock_status() === 'instock' or $mais->get_stock_status() === 'instock' ) ) : ?>
-            <?php if ( ( ! is_product_tag('promotie') and $position_in_grid === 1 ) ) : ?>
+            <?php if ( ( $position_in_grid === 1 ) ) : ?>
                 <li class="promo-banner vertical">
                     <?php
                         $image = '<img src="'.esc_attr( get_stylesheet_directory_uri().'/images/promoties/koffie-2025-staand.jpg' ).'" />';
@@ -71,7 +71,7 @@ if ( ! $nm_theme_options['product_action_link'] ) {
                 </li>
             <?php endif; ?>
             
-            <?php if ( is_product_tag('promotie') and $position_in_grid === 1 ) : ?>
+            <?php if ( 1 === 2 ) : ?>
                 <li class="promo-banner horizontal">
                     <?php
                         $image = '<img src="'.esc_attr( get_stylesheet_directory_uri().'/images/promoties/koffie-2025-liggend.jpg' ).'" />';
