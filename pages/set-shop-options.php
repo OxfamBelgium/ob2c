@@ -113,7 +113,12 @@
 					settings_fields('oxfam-options-local');
 				}
 				
-				do_mollie_reseller_api_logic( get_option( 'oxfam_mollie_partner_id', 2485891 ) );
+				if ( current_user_can('update_core') and get_current_blog_id() === 24 ) {
+					$partner_id = get_option( 'oxfam_mollie_partner_id_new', 2485891 );
+				} else {
+					$partner_id = get_option( 'oxfam_mollie_partner_id', 2485891 );
+				}
+				do_mollie_reseller_api_logic( $partner_id );
 				
 				if ( does_sendcloud_delivery() ) {
 					echo "<tr>";
@@ -144,7 +149,7 @@
 					<label for="oxfam_mollie_partner_id" title="Je betaalaccount valt onder het contract dat Oxfam Fair Trade sloot met Mollie. Aan de hand van deze ID kunnen we de nodige API-keys invullen en in geval van nood inloggen op jullie lokale account.">Partner-ID Mollie:</label>
 				</th>
 				<td class="right">
-					<input type="text" name="oxfam_mollie_partner_id" class="text-input" value="<?= esc_attr( get_option('oxfam_mollie_partner_id') ); ?>"<?php if ( ! current_user_can('create_sites') ) echo ' readonly'; ?>>
+					<input type="text" name="oxfam_mollie_partner_id" class="text-input" value="<?= esc_attr( $partner_id ); ?>"<?php if ( ! current_user_can('create_sites') ) echo ' readonly'; ?>>
 				</td>
 			</tr>
 			<?php

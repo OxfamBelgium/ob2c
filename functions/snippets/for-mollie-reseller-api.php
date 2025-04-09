@@ -11,31 +11,31 @@
 	 * @version     1.10.4
 	 *
 	 */
-
+	
 	// WordPress volledig inladen, zodat we alle helper functies en constanten kunnen aanspreken
 	// Relatief pad enkel geldig vanuit subfolder in subfolder van themamap!
 	require_once '../../../../../wp-load.php';
-
+	
 	if ( $_GET['import_key'] !== IMPORT_KEY ) {
 		die( "Access prohibited!" );
 	}
-
-	$blog_id_not_wp = 77;
-	$login = '';
-	$email = '';
-	$shop_node = 0;
-	$fname = '';
-	$lname = '';
-
+	
+	$blog_id_not_wp = 24;
+	$login = 'antwerpencentrum';
+	$email = 'wannes.perck@gmail.com';
+	$shop_node = 212;
+	$fname = 'Wannes';
+	$lname = 'Perck';
+	
 	switch_to_blog( $blog_id_not_wp );
 	$company = get_bloginfo('name');
-
+	
 	$test_mode = false;
 	/*********************************/
 	/* UITSCHAKELEN INDIEN VOOR ECHT */
 	/*********************************/
 	$test_mode = true;
-
+	
 	if ( $test_mode ) {
 		$user_args = array(
 			'user_login' => $login,
@@ -107,7 +107,7 @@
 			}
 		}
 	}
-
+	
 	require_once WP_PLUGIN_DIR.'/mollie-reseller-api/autoloader.php';
 	Mollie_Autoloader::register();
 	$mollie = new Mollie_Reseller( MOLLIE_PARTNER, MOLLIE_PROFILE, MOLLIE_APIKEY );
@@ -120,10 +120,9 @@
 		$phone = '32'.str_replace( '/', '', str_replace( '.', '', substr( get_oxfam_shop_data('telephone'), 1 ) ) );
 		$email = get_blog_option( $blog_id_not_wp, 'admin_email' );
 		$btw = str_replace( ' ', '', str_replace( '.', '', get_oxfam_shop_data('tax') ) );
-		$iban = str_replace( ' ', '', get_oxfam_shop_data('account') );
 		$url = get_bloginfo('url');
 		
-		// HEADQUARTER IS LEEG SINDS NIEUWE OWW-SITE
+		// HEADQUARTER EN ACCOUNT ZIJN LEEG SINDS NIEUWE OBE-SITE
 		// $headquarter = get_oxfam_shop_data('headquarter');
 		// $lines = explode( ', ', $headquarter, 2 );
 		// $billing_address = trim($lines[0]);
@@ -136,22 +135,14 @@
 		$billing_address = $address;
 		$billing_zip = $zip;
 		$billing_city = $city;
+		$iban = 'BE56001813666388';
+		$bic = 'GEBABEBB';
 		
 		// Check of we deze KBO-parameters niet handmatig moeten overrulen
 		// Moet in de praktijk toch opnieuw in Mollie, dus niet zo belangrijk
 		// $representative = '';
 		
-		// $bic = 'NICABEBB';
-		// $bic = 'AXABBE22';
-		// $bic = 'GEBABEBB';
-		// $bic = 'GKCCBEBB';
-		// $bic = 'HBKABE22';
-		$bic = 'KREDBEBB';
-		// $bic = 'VDSPBE91';
-		// $bic = 'ARSPBE22';
-		// $bic = 'TRIOBEBB';
-
-		$parameters = array( 
+		$parameters = array(
 			'name' => $representative,
 			'company_name' => $company,
 			'url' => $url,
@@ -164,15 +155,11 @@
 			'legal_form' => 'vzw-be',
 			'vat_number' => $btw,
 			'representative' => $representative,
-			// 'billing_address' => $billing_address,
-			// 'billing_zipcode' => $billing_zip,
-			// 'billing_city' => $billing_city,
-			// 'billing_country' => 'BE',
 			'bankaccount_iban' => $iban,
 			'bankaccount_bic' => $bic,
 			'locale' => 'nl_BE',
 		);
-
+		
 		echo '<pre>'.var_export( $parameters, true ).'</pre>';
 		
 		if ( $test_mode ) {
@@ -187,7 +174,7 @@
 	} catch (Mollie_Exception $e) {
 		die( "An error occurred: ".$e->getMessage() );
 	}
-
+	
 	if ( $accountxml->resultcode == '10' and ! array_key_exists( 'testmode', $parameters ) ) {
 		echo "<p>".$accountxml->resultmessage."</p>";
 		
@@ -196,16 +183,16 @@
 		if ( update_blog_option( $blog_id_not_wp, 'oxfam_mollie_partner_id', (string) $accountxml->partner_id ) ) {
 			echo "Partner-ID gewijzigd in webshop!<br/>";
 		}
-
+		
 		echo "Wachtwoord: ".$accountxml->password."<br/>";
 		$user = get_user_by( 'email', $email );
 		if ( $user ) {
 			wp_set_password( (string) $accountxml->password, $user->ID );
 			echo "Wachtwoord gekopieerd naar lokale beheerder!<br/>";
 		}
-
+		
 		echo "<p>&nbsp;</p>";
-
+		
 		$profilexml = $mollie->profileCreateByPartnerId( $accountxml->partner_id, $company, $url, $email, $phone, 5499 );
 		
 		if ( $profilexml->resultcode == '10' ) {
@@ -213,9 +200,9 @@
 			
 			echo "LIVE API: ".$profilexml->profile->api_keys->live."<br/>";
 			if ( update_blog_option( $blog_id_not_wp, 'mollie-payments-for-woocommerce_live_api_key', (string) $profilexml->profile->api_keys->live ) ) {
-				echo "Live API-key gewijzigd in webshop!<br/>";	
+				echo "Live API-key gewijzigd in webshop!<br/>";
 			}
-
+			
 			echo "TEST API: ".$profilexml->profile->api_keys->test."<br/>";
 			if ( update_blog_option( $blog_id_not_wp, 'mollie-payments-for-woocommerce_test_api_key', (string) $profilexml->profile->api_keys->test ) ) {
 				echo "Test API-key gewijzigd in webshop!<br/>";
@@ -226,6 +213,7 @@
 	} else {
 		echo '<pre>'.var_export( $accountxml, true ).'</pre>';
 	}
-
+	
 	restore_current_blog();
+	
 ?>
