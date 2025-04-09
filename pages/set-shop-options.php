@@ -115,6 +115,10 @@
 				
 				if ( current_user_can('update_core') and get_current_blog_id() === 24 ) {
 					$partner_id = get_option( 'oxfam_mollie_partner_id_new', 2485891 );
+					echo "<tr>";
+						echo "<th class='left' style='color: red;'>Je ziet als admin momenteel de nieuwe Mollie-account van Antwerpen i.p.v. Deurne!</th>";
+						echo "<td></td>";
+					echo "</tr>";
 				} else {
 					$partner_id = get_option( 'oxfam_mollie_partner_id', 2485891 );
 				}
