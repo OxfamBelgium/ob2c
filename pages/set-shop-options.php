@@ -3,7 +3,7 @@
 	
 	require_once WP_CONTENT_DIR.'/plugins/mollie-reseller-api/autoloader.php';
 	
-	function do_mollie_reseller_api_logic( $partner_id ) {
+	function do_mollie_reseller_api_logic( $partner_id, $temporary = false ) {
 		Mollie_Autoloader::register();
 		$mollie = new Mollie_Reseller( MOLLIE_PARTNER, MOLLIE_PROFILE, MOLLIE_APIKEY );
 		
@@ -27,7 +27,11 @@
 			
 			echo "<tr>";
 				echo "<th class='left'><a href='".$href."' target='_blank'>Log volautomatisch in op je Mollie-betaalaccount &raquo;</a></th>";
-				echo "<td class='right'>Opgelet: deze link is slechts 60 seconden geldig! Herlaad desnoods even deze pagina.</td>";
+				echo "<td class='right'>Opgelet: deze link is slechts 60 seconden geldig! Herlaad desnoods even deze pagina.";
+				if ( $temporary ) {
+					echo "<br/><span style='color: red;'>Je ziet als admin momenteel de nieuwe Mollie-account van Antwerpen i.p.v. Deurne</span>";
+				}
+				echo "</td>";
 			echo "</tr>";
 			
 			$methods = $mollie->availablePaymentMethodsByPartnerId( $partner_id );
@@ -115,14 +119,11 @@
 				
 				if ( current_user_can('update_core') and get_current_blog_id() === 24 ) {
 					$partner_id = get_option( 'oxfam_mollie_partner_id_new', 2485891 );
-					echo "<tr>";
-						echo "<th class='left' style='color: red;'>Je ziet als admin momenteel de nieuwe Mollie-account van Antwerpen i.p.v. Deurne!</th>";
-						echo "<td></td>";
-					echo "</tr>";
+					do_mollie_reseller_api_logic( $partner_id, true );
 				} else {
 					$partner_id = get_option( 'oxfam_mollie_partner_id', 2485891 );
+					do_mollie_reseller_api_logic( $partner_id );
 				}
-				do_mollie_reseller_api_logic( $partner_id );
 				
 				if ( does_sendcloud_delivery() ) {
 					echo "<tr>";
@@ -153,7 +154,7 @@
 					<label for="oxfam_mollie_partner_id" title="Je betaalaccount valt onder het contract dat Oxfam Fair Trade sloot met Mollie. Aan de hand van deze ID kunnen we de nodige API-keys invullen en in geval van nood inloggen op jullie lokale account.">Partner-ID Mollie:</label>
 				</th>
 				<td class="right">
-					<input type="text" name="oxfam_mollie_partner_id" class="text-input" value="<?= esc_attr( $partner_id ); ?>"<?php if ( ! current_user_can('create_sites') ) echo ' readonly'; ?>>
+					<input type="text" name="oxfam_mollie_partner_id" class="text-input" value="<?= esc_attr( $partner_id ); ?>" readonly>
 				</td>
 			</tr>
 			<?php
