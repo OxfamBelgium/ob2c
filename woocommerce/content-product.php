@@ -49,7 +49,7 @@ if ( ! $nm_theme_options['product_action_link'] ) {
     <?php $coupon = new WC_Coupon('202505-wftd'); ?>
     
     <!-- Geen is_valid() gebruiken, zal pas true retourneren als de korting al effectief in het winkelmandje zit! -->
-    <?php if ( $coupon->get_date_expires() instanceof WC_DateTime and date_i18n('Y-m-d') < $coupon->get_date_expires()->date_i18n('Y-m-d') ) : ?>
+    <?php if ( $coupon->get_date_expires() instanceof WC_DateTime and date_i18n('Y-m-d') < $coupon->get_date_expires()->date_i18n('Y-m-d') and 1 === 2 ) : ?>
         <?php
             $couscous = wc_get_product( wc_get_product_id_by_sku('27055') );
             $term_link = get_term_link( 'promotie', 'product_tag' );
