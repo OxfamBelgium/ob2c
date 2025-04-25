@@ -35,9 +35,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 						$products_tags[] = 'promotie';
 					}
 					
-					$products_tags[] = 'pasen';
+					// $products_tags[] = 'pasen';
 					// $products_tags[] = 'sinterklaas';
-					// $products_tags[] = 'faire-feesten';
 					
 					foreach ( $products_tags as $product_slug ) {
 						$term = get_term_by( 'slug', $product_slug, 'product_tag' );
