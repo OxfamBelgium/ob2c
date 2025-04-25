@@ -46,17 +46,16 @@ if ( ! $nm_theme_options['product_action_link'] ) {
 ?>
 
 <?php if ( in_array( $woocommerce_loop['name'], array( '', 'sale_products' ) ) ) : ?>
-    <?php $coupon = new WC_Coupon('202503-koffie'); ?>
+    <?php $coupon = new WC_Coupon('202505-wftd'); ?>
     
     <!-- Geen is_valid() gebruiken, zal pas true retourneren als de korting al effectief in het winkelmandje zit! -->
     <?php if ( $coupon->get_date_expires() instanceof WC_DateTime and date_i18n('Y-m-d') < $coupon->get_date_expires()->date_i18n('Y-m-d') ) : ?>
         <?php
-            $koffieroom = wc_get_product( wc_get_product_id_by_sku('24128') );
-            $mais = wc_get_product( wc_get_product_id_by_sku('24129') );
-            $term_link = get_term_link( 'koffie', 'product_cat' );
+            $couscous = wc_get_product( wc_get_product_id_by_sku('27055') );
+            $term_link = get_term_link( 'promotie', 'product_tag' );
         ?>
         
-        <?php if ( $koffieroom !== false and $mais !== false and ( $koffieroom->get_stock_status() === 'instock' or $mais->get_stock_status() === 'instock' ) ) : ?>
+        <?php if ( $couscous !== false and $couscous->get_stock_status() === 'instock' ) : ?>
             <?php if ( ( $position_in_grid === 1 ) ) : ?>
                 <li class="promo-banner vertical">
                     <?php

@@ -112,10 +112,10 @@
 	add_action( 'wjecf_assert_coupon_is_valid', 'check_if_free_products_are_on_stock', 1000, 2 );
 	
 	function check_if_free_products_are_on_stock( $coupon, $wc_discounts  ) {
-		if ( in_array( $coupon->get_code(), array( '202503-koffie' ) ) and date_i18n('Y-m-d') < $coupon->get_date_expires()->date_i18n('Y-m-d') ) {
-			$couscous = wc_get_product( wc_get_product_id_by_sku( '24128', '24129' ) );
+		if ( in_array( $coupon->get_code(), array( '202505-wftd' ) ) and date_i18n('Y-m-d') < $coupon->get_date_expires()->date_i18n('Y-m-d') ) {
+			$couscous = wc_get_product( wc_get_product_id_by_sku( '27055' ) );
 			if ( $couscous !== false and $couscous->get_stock_status() !== 'instock' ) {
-				throw new Exception( __( 'Deze webshop heeft helaas geen chocoladerepen met koffieroom of geroosterde maïs op voorraad. Gelieve een ander afhaalpunt te kiezen.', 'oxfam-webshop' ), 79106 );
+				throw new Exception( __( 'Deze webshop heeft helaas geen couscous op voorraad. Gelieve een ander afhaalpunt te kiezen.', 'oxfam-webshop' ), 79106 );
 			}
 		}
 	}
