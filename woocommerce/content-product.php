@@ -49,7 +49,7 @@ if ( ! $nm_theme_options['product_action_link'] ) {
     <?php $coupon = new WC_Coupon('202505-wftd'); ?>
     
     <!-- Geen is_valid() gebruiken, zal pas true retourneren als de korting al effectief in het winkelmandje zit! -->
-    <?php if ( $coupon->get_date_expires() instanceof WC_DateTime and date_i18n('Y-m-d') < $coupon->get_date_expires()->date_i18n('Y-m-d') and 1 === 2 ) : ?>
+    <?php if ( $coupon->get_date_expires() instanceof WC_DateTime and date_i18n('Y-m-d') < $coupon->get_date_expires()->date_i18n('Y-m-d') ) : ?>
         <?php
             $couscous = wc_get_product( wc_get_product_id_by_sku('27055') );
             $term_link = get_term_link( 'promotie', 'product_tag' );
@@ -59,7 +59,7 @@ if ( ! $nm_theme_options['product_action_link'] ) {
             <?php if ( ( $position_in_grid === 1 ) ) : ?>
                 <li class="promo-banner vertical">
                     <?php
-                        $image = '<img src="'.esc_attr( get_stylesheet_directory_uri().'/images/promoties/koffie-2025-staand.jpg' ).'" />';
+                        $image = '<img src="'.esc_attr( get_stylesheet_directory_uri().'/images/promoties/palestina-2025-staand.png' ).'" />';
                         if ( ! is_wp_error( $term_link ) ) {
                             echo '<a href="'.esc_url( $term_link ).'#nm-shop-products">'.$image.'</a>';
                         } else {
