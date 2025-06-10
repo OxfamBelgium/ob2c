@@ -29,7 +29,7 @@
 				echo "<th class='left'><a href='".$href."' target='_blank'>Log volautomatisch in op je Mollie-betaalaccount &raquo;</a></th>";
 				echo "<td class='right'>Opgelet: deze link is slechts 60 seconden geldig! Herlaad desnoods even deze pagina.";
 				if ( $temporary ) {
-					echo "<br/><span style='color: red;'>Je ziet als admin momenteel de nieuwe Mollie-account van Antwerpen i.p.v. Deurne</span>";
+					echo "<br/><span style='color: red;'>Je ziet als admin momenteel de oude Mollie-account van Deurne i.p.v. Antwerpen</span>";
 				}
 				echo "</td>";
 			echo "</tr>";
@@ -118,7 +118,7 @@
 				}
 				
 				if ( current_user_can('update_core') and get_current_blog_id() === 24 ) {
-					$partner_id = get_option( 'oxfam_mollie_partner_id_new', 2485891 );
+					$partner_id = get_option( 'oxfam_mollie_partner_id_old', 2485891 );
 					do_mollie_reseller_api_logic( $partner_id, true );
 				} else {
 					$partner_id = get_option( 'oxfam_mollie_partner_id', 2485891 );
