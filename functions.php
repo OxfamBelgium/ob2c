@@ -1331,35 +1331,35 @@
 
 	function wpsl_change_results_sorting( $store_data ) {
 		$results_contain_delivery_store = false;
-
+		
 		foreach ( $store_data as $key => $row ) {
 			// Formatteer de afstand op z'n Belgisch
 			$store_data[ $key ]['distance'] = round( $row['distance'], 0 );
-
+			
 			// Check of er een resultaat is dat thuislevering organiseert
-			if ( strpos( $store_data[ $key ]['delivery'], 'delivery active' ) !== false ) {
+			if ( strpos( $row['delivery'], 'delivery active' ) !== false ) {
 				$results_contain_delivery_store = true;
 			}
 		}
-
+		
 		// Injecteer de thuisleverwinkel indien die nog niet tussen de resultaten zit (ongeacht de afstand)
 		if ( ! $results_contain_delivery_store ) {
 			// Numerieke keys, dus elementen worden niet overschreven
 			// Array wordt niet meer gesorteerd, dus dit bepaalt ook de volgorde
 			$store_data = array_merge( get_default_webshop_for_home_delivery(), $store_data );
 		}
-
+		
 		$custom_sort = array();
 		foreach ( $store_data as $key => $row ) {
 			// Winkels zonder webshop-URL (= lege string) onderaan plaatsen
 			// Key bestaat niet indien de winkel geen webshop heeft!
 			// $custom_sort[ $key ] = ! empty( $row['webshop'] ) ? $row['webshop'] : '';
-
+			
 			// Sorteer nog eens opnieuw op afstand
 			$custom_sort[ $key ] = ! empty( $row['distance'] ) ? $row['distance'] : 0;
 		}
 		array_multisort( $custom_sort, SORT_ASC, SORT_REGULAR, $store_data );
-
+		
 		// if ( current_user_can('update_core') ) {
 		// 	write_log( print_r( $store_data, true ) );
 		// }
@@ -1375,14 +1375,15 @@
 
 	function get_default_webshop_for_home_delivery() {
 		$store_data = array();
-
+		
 		if ( class_exists('WPSL_Frontend') ) {
 			$wpsl_frontend = new WPSL_Frontend();
-
+			
 			// Haal de gezochte postcode op uit cookie
 			if ( ! empty( $_COOKIE['current_location'] ) ) {
 				$current_location = intval( $_COOKIE['current_location'] );
 				$all_stores_by_postcode = get_webshops_by_postcode(true);
+				
 				if ( array_key_exists( $current_location, $all_stores_by_postcode ) ) {
 					$store = new stdClass();
 					$store->ID = $all_stores_by_postcode[ $current_location ];
@@ -1390,7 +1391,7 @@
 					$store->distance = 3;
 					// $store->lat en $store->lng mogen we weglaten, wordt later opgevuld
 					write_log( "Ontbrekende thuisleverwinkel met store-ID ".$store->ID." toegevoegd aan resultatenlijst voor ".$current_location );
-
+					
 					$stores = array();
 					$stores[] = $store;
 					// Dit vult alle andere velden aan, ook de custom dynamische
@@ -1398,7 +1399,7 @@
 				}
 			}
 		}
-
+		
 		return $store_data;
 	}
 
@@ -7779,15 +7780,16 @@
 					$stores = new WP_Query( $store_args );
 					
 					if ( count( $stores->posts ) > 0 ) {
-						// Er kunnen meerdere winkels zijn met dezelfde blog-ID, hoe selecteren we de hoofdwinkel?
-						// Voorlopig nemen we gewoon de eerste uit de lijst resultaten
 						if ( $return_all_shops ) {
 							if ( ! array_key_exists( $zip, $global_zips ) ) {
 								$global_zips[ $zip ] = array();
 							}
-							$global_zips[ $zip ][] = reset( $stores->posts );
+							
+							// Er kunnen meerdere winkels zijn met dezelfde blog-ID, selecteer de hoofdwinkel
+							$global_zips[ $zip ][] = get_main_shop_from_store_list( $stores->posts, $zip );
 						} else {
-							$global_zips[ $zip ] = reset( $stores->posts );
+							// Er kunnen meerdere winkels zijn met dezelfde blog-ID, selecteer de hoofdwinkel
+							$global_zips[ $zip ] = get_main_shop_from_store_list( $stores->posts, $zip );
 						}
 					}
 					
@@ -7809,6 +7811,25 @@
 		
 		ksort( $global_zips );
 		return $global_zips;
+	}
+	
+	function get_main_shop_from_store_list( $store_ids, $zip ) {
+		if ( false === ( $main_shop = get_transient( 'oxfam_main_shop_for_zip_'.$zip ) ) ) {
+			// Als fallback nemen we gewoon de eerste uit de lijst
+			$main_shop = reset( $store_ids );
+			
+			// Check of er handmatig 'Hoofdwinkel' toegevoegd werd aan een Store Locator entry
+			foreach ( $store_ids as $store_id ) {
+				if ( strpos( get_the_content( NULL, false, $store_id ), 'Hoofdwinkel' ) !== false ) {
+					$main_shop = $store_id;
+					break;
+				}
+			}
+			
+			set_transient( 'oxfam_main_shop_for_zip_'.$zip, $main_shop, WEEK_IN_SECONDS );
+		}
+		
+		return $main_shop;
 	}
 
 
