@@ -117,13 +117,8 @@
 					settings_fields('oxfam-options-local');
 				}
 				
-				if ( current_user_can('update_core') and get_current_blog_id() === 24 ) {
-					$partner_id = get_option( 'oxfam_mollie_partner_id_old', 2485891 );
-					do_mollie_reseller_api_logic( $partner_id, true );
-				} else {
-					$partner_id = get_option( 'oxfam_mollie_partner_id', 2485891 );
-					do_mollie_reseller_api_logic( $partner_id );
-				}
+				$partner_id = get_option( 'oxfam_mollie_partner_id', 2485891 );
+				do_mollie_reseller_api_logic( $partner_id );
 				
 				if ( does_sendcloud_delivery() ) {
 					echo "<tr>";
