@@ -112,16 +112,16 @@
 	add_action( 'wjecf_assert_coupon_is_valid', 'check_if_free_products_are_on_stock', 1000, 2 );
 	
 	function check_if_free_products_are_on_stock( $coupon, $wc_discounts  ) {
-		if ( in_array( $coupon->get_code(), array( '202505-wftd' ) ) and date_i18n('Y-m-d') < $coupon->get_date_expires()->date_i18n('Y-m-d') ) {
-			$couscous = wc_get_product( wc_get_product_id_by_sku( '27055' ) );
-			if ( $couscous !== false and $couscous->get_stock_status() !== 'instock' ) {
-				throw new Exception( __( 'Deze webshop heeft helaas geen couscous op voorraad. Gelieve een ander afhaalpunt te kiezen.', 'oxfam-webshop' ), 79106 );
+		if ( in_array( $coupon->get_code(), array( '202509-chips' ) ) and date_i18n('Y-m-d') < $coupon->get_date_expires()->date_i18n('Y-m-d') ) {
+			$yucachips = wc_get_product( wc_get_product_id_by_sku( '25409' ) );
+			if ( $yucachips !== false and $yucachips->get_stock_status() !== 'instock' ) {
+				throw new Exception( __( 'Deze webshop heeft helaas geen yucachips op voorraad. Gelieve een ander afhaalpunt te kiezen.', 'oxfam-webshop' ), 79106 );
 			}
 		}
 	}
 	
 	// Probeer wijnduo's enkel toe te passen op gelijke paren (dus niet 3+1, 5+1, 5+3, ...)
-	add_filter( 'woocommerce_coupon_get_apply_quantity', 'limit_coupon_to_equal_pairs', 100, 4 );
+	// add_filter( 'woocommerce_coupon_get_apply_quantity', 'limit_coupon_to_equal_pairs', 100, 4 );
 	
 	function limit_coupon_to_equal_pairs( $apply_quantity, $item, $coupon, $wc_discounts ) {
 		if ( is_admin() ) {
