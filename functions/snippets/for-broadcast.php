@@ -86,7 +86,7 @@
 				// $product->set_date_created( $old_product->get_date_created()->__toString() );
 				$product->set_stock_status( $old_product->get_stock_status() );
 				$product->save();
-				write_log( get_bloginfo('name').": stock status '".$old_product->get_stock_status()."' and date '".$old_product->get_date_created()->date_i18n('Y-m-d')."' of old SKU ".$old_sku." copied to new SKU ".$new_sku );
+				write_log( get_bloginfo('name').": stock status '".$old_product->get_stock_status()."' of old SKU ".$old_sku." copied to new SKU ".$new_sku );
 			}
 		}
 	}

@@ -6318,20 +6318,20 @@
 	add_action( 'wp_ajax_oxfam_stock_action', 'oxfam_stock_action_callback' );
 	add_action( 'wp_ajax_oxfam_bulk_stock_action', 'oxfam_bulk_stock_action_callback' );
 	add_action( 'wp_ajax_oxfam_invitation_action', 'oxfam_invitation_action_callback' );
-
+	
 	function oxfam_stock_action_callback() {
 		echo ob2c_save_local_product_details( $_POST['id'], $_POST['meta'], $_POST['value'] );
 		wp_die();
 	}
-
+	
 	function oxfam_bulk_stock_action_callback() {
 		echo ob2c_change_regular_products_stock_status( $_POST['status'], $_POST['assortment'] );
 		wp_die();
 	}
-
+	
 	function ob2c_save_local_product_details( $product_id, $meta, $value ) {
 		$output = 'ERROR';
-
+		
 		$product = wc_get_product( $product_id );
 		if ( $product ) {
 			if ( $meta === 'stockstatus' ) {
@@ -6346,14 +6346,18 @@
 					}
 					$message = 'Voorraadstatus vertaald en opgeslagen!';
 				} else {
-					$product->set_stock_status( $value );
-					$message = 'Voorraadstatus opgeslagen!';
+					// Als voorraadbeheer niet correct uitgeschakeld werd na publicatie, zal instellen van voorraadstatus stilletjes mislukken
+					// Probeer de status in zo'n geval niet te wijzigen, zodat de gebruiker een error te zien krijgt en de helpdesk kan contacteren
+					if ( ! $product->get_manage_stock() ) {
+						$product->set_stock_status( $value );
+						$message = 'Voorraadstatus opgeslagen!';
+					}
 				}
 			} elseif ( $meta === 'featured' ) {
 				$product->set_featured( $value );
 				$message = 'Uitlichting opgeslagen!';
 			}
-
+			
 			if ( $product->save() ) {
 				$output = $message;
 				// Flush na afloop de W3TC-cache van deze specifieke productpagina?
@@ -6362,17 +6366,17 @@
 				// }
 			}
 		}
-
+		
 		return $output;
 	}
-
+	
 	function ob2c_change_regular_products_stock_status( $status, $assortment ) {
 		if ( ! array_key_exists( $status, wc_get_product_stock_status_options() ) ) {
 			return 'ERROR - INVALID STOCK STATUS PASSED';
 		}
-
+		
 		$output = 'ERROR';
-
+		
 		// Query alle gepubliceerde producten, orden op ompaknummer
 		$args = array(
 			'post_type'			=> 'product',
@@ -6383,25 +6387,25 @@
 			'order'				=> 'ASC',
 		);
 		$products = new WP_Query( $args );
-
+		
 		if ( $products->have_posts() ) {
 			$i = 0;
 			$empties = get_oxfam_empties_skus_array();
-
+			
 			while ( $products->have_posts() ) {
 				$products->the_post();
 				$product = wc_get_product( get_the_ID() );
-
+				
 				// Verhinder dat leeggoed ook bewerkt wordt
 				if ( $product === false or in_array( $product->get_sku(), $empties ) ) {
 					continue;
 				}
-
+				
 				// Logica eventueel reeds toepassen in WP_Query voor performantie?
 				if ( ! ob2c_product_matches_assortment( $product, $assortment ) ) {
 					continue;
 				}
-
+				
 				if ( $product->get_stock_status() !== $status ) {
 					$product->set_stock_status( $status );
 					if ( $product->save() ) {
@@ -6410,12 +6414,12 @@
 				}
 			}
 			wp_reset_postdata();
-
+			
 			$output = $i.' voorraadstatussen bijgewerkt!';
 		} else {
 			$output = 'ERROR - NO PRODUCTS FOUND';
 		}
-
+		
 		return $output;
 	}
 
@@ -6424,7 +6428,7 @@
 			case 'general':
 				return true;
 				break;
-
+				
 			case 'chocolade':
 			case 'koffie':
 			case 'wijn':
@@ -6437,43 +6441,43 @@
 					return true;
 				}
 				break;
-
+				
 			case 'crafts':
 				if ( is_crafts_product( $product ) ) {
 					return true;
 				}
 				break;
-
+				
 			case 'augustus':
 				if ( has_term( 'augustus-2021', 'product_tag', $product->get_id() ) ) {
 					return true;
 				}
 				break;
-
+				
 			case 'april':
 				if ( has_term( 'april-2021', 'product_tag', $product->get_id() ) ) {
 					return true;
 				}
 				break;
-
+				
 			case 'januari':
 				if ( has_term( 'januari-2021', 'product_tag', $product->get_id() ) ) {
 					return true;
 				}
 				break;
-
+				
 			case 'oktober':
 				if ( has_term( 'oktober-2020', 'product_tag', $product->get_id() ) ) {
 					return true;
 				}
 				break;
-
+				
 			case 'local':
 				if ( ! is_national_product( $product ) ) {
 					return true;
 				}
 				break;
-
+				
 			// Voorlopig niet meer gebruikt
 			case 'national':
 				if ( is_national_product( $product ) ) {
@@ -6481,10 +6485,9 @@
 				}
 				break;
 		}
-
+		
 		return false;
 	}
-	
 	
 	function oxfam_invitation_action_callback() {
 		$new_account_path = get_stylesheet_directory() . '/woocommerce/emails/customer-new-account.php';
