@@ -109,7 +109,7 @@
 	}
 	
 	// Schakel kortingsbon met een gratis product uit als de webshop geen voorraad heeft
-	add_action( 'wjecf_assert_coupon_is_valid', 'check_if_free_products_are_on_stock', 1000, 2 );
+	// add_action( 'wjecf_assert_coupon_is_valid', 'check_if_free_products_are_on_stock', 1000, 2 );
 	
 	function check_if_free_products_are_on_stock( $coupon, $wc_discounts  ) {
 		if ( in_array( $coupon->get_code(), array( '202509-chips' ) ) and date_i18n('Y-m-d') < $coupon->get_date_expires()->date_i18n('Y-m-d') ) {

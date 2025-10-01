@@ -49,35 +49,33 @@ if ( ! $nm_theme_options['product_action_link'] ) {
     <?php $coupon = new WC_Coupon('202509-chips'); ?>
     
     <!-- Geen is_valid() gebruiken, zal pas true retourneren als de korting al effectief in het winkelmandje zit! -->
-    <?php if ( $coupon->get_date_expires() instanceof WC_DateTime and date_i18n('Y-m-d') < $coupon->get_date_expires()->date_i18n('Y-m-d') ) : ?>
+    <?php // if ( $coupon->get_date_expires() instanceof WC_DateTime and date_i18n('Y-m-d') < $coupon->get_date_expires()->date_i18n('Y-m-d') ) : ?>
+    <?php if ( wp_date('Y-m-d') <= '2025-10-11' ) : ?>
         <?php
             $yucachips = wc_get_product( wc_get_product_id_by_sku('25409') );
             $term_link = get_term_link( 'promotie', 'product_tag' );
         ?>
         
+        <?php if ( $position_in_grid === 5 ) : ?>
+            <li class="promo-banner vertical">
+                <?php
+                    $image = '<img src="'.esc_attr( get_stylesheet_directory_uri().'/images/promoties/wvdft-2025-staand.jpg' ).'" />';
+                    echo '<a href="https://apps.oxfambelgie.be/wedstrijd/" target="_blank">'.$image.'</a>';
+                    $position_in_grid++;
+                ?>
+            </li>
+        <?php endif; ?>
+        
         <?php if ( $yucachips !== false and $yucachips->get_stock_status() === 'instock' ) : ?>
             <?php if ( 1 === 2 ) : ?>
-                <li class="promo-banner vertical">
+                <li class="promo-banner horizontal">
                     <?php
-                        $image = '<img src="'.esc_attr( get_stylesheet_directory_uri().'/images/promoties/palestina-2025-staand.png' ).'" />';
+                        $image = '<img src="'.esc_attr( get_stylesheet_directory_uri().'/images/promoties/yucachips-2025-liggend.jpg' ).'" />';
                         if ( ! is_wp_error( $term_link ) ) {
                             echo '<a href="'.esc_url( $term_link ).'#nm-shop-products">'.$image.'</a>';
                         } else {
                             echo $image;
                         }
-                        $position_in_grid++;
-                    ?>
-                </li>
-            <?php endif; ?>
-            
-            <?php if ( $position_in_grid === 5 ) : ?>
-                <li class="promo-banner horizontal">
-                    <?php
-                        $image = '<img src="'.esc_attr( get_stylesheet_directory_uri().'/images/promoties/yucachips-2025-liggend.jpg' ).'" />';
-                        // if ( ! is_wp_error( $term_link ) ) {
-                        //     echo '<a href="'.esc_url( $term_link ).'#nm-shop-products">'.$image.'</a>';
-                        // }
-                        echo $image;
                         $position_in_grid++;
                     ?>
                 </li>
