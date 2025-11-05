@@ -236,9 +236,10 @@
 					$spreadsheet->setActiveSheetIndexByName( $credit_ref );
 				} catch (Exception $e) {
 					// Maak het werkblad aan indien de referentie nog niet bestaat in de template
-					write_log("Excel-werkblad bestaat nog niet, probeer het aan te maken ...");
-					// @toCheck: Werkt niet goed, nog steeds fatale error ...
+					write_log("Excel-werkblad '".$credit_ref."' niet gevonden, probeer aan te maken ...");
 					$empty_sheet->setTitle( $credit_ref );
+					// @toCheck: Fatale error omdat we werkblad iedere keer opnieuw proberen toevoegen?
+					// Workbook already contains a worksheet named 'X'. Rename this worksheet first.
 					$spreadsheet->addSheet( $empty_sheet );
 					$spreadsheet->setActiveSheetIndexByName( $credit_ref );
 				}

@@ -7144,7 +7144,7 @@
 		echo '<div class="rss-widget">';
 		echo '<p>De <a href="https://github.com/OxfamBelgium/ob2c/wiki" target="_blank">online FAQ voor webshopbeheerders</a> staat online. Hierin verzamelen we alle mogelijke vragen die jullie als lokale webshopbeheerders kunnen hebben en beantwoorden we ze punt per punt met tekst en screenshots. Gebruik eventueel de zoekfunctie bovenaan rechts.</p>';
 		echo '<p>Daarnaast kun je de nieuwe slides van de voorbije opleidingssessies raadplegen voor een overzicht van alle afspraken en praktische details: <a href="https://shop.oxfamwereldwinkels.be/wp-content/uploads/slides-opleiding-B2C-webshop-concept.pdf" download>Deel 1: Concept</a> (16/05/2020) en <a href="https://shop.oxfamwereldwinkels.be/wp-content/uploads/slides-opleiding-B2C-webshop-praktisch.pdf" download>Deel 2: Praktisch</a> (30/05/2020). Op <a href="https://copain.oww.be/webshop" target="_blank">de webshoppagina op Copain</a> vind je een overzicht van de belangrijkste documenten.</p>';
-		echo '<p>Stuur een mailtje naar de <a href="mailto:webshop@oft.be">Helpdesk E-Commerce</a> als er toch nog iets onduidelijk is, of als je een suggestie hebt. Tineke, Ive en Frederik helpen je zo snel mogelijk verder.</p>';
+		echo '<p>Stuur een mailtje naar de <a href="mailto:webshop@oft.be">Helpdesk E-Commerce</a> als er toch nog iets onduidelijk is, of als je een suggestie hebt.</p>';
 		echo '</div>';
 	}
 

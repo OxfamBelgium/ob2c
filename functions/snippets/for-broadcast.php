@@ -65,7 +65,7 @@
 	
 	
 	// Voorraad overzetten van oud naar nieuw ompaknummer (enkel indien consumenteneenheid identiek gebleven is!)
-	// Na afloop plaats je het oude ompaknummer in concept (voor latere definitieve verwijdering)
+	// Na afloop plaats je het oude ompaknummer in de prullenbak (voor latere definitieve verwijdering)
 	$replaced_skus = get_site_option( 'oxfam_shop_dashboard_notice_replaced_products', array() );
 	foreach ( $replaced_skus as $old_new ) {
 		$parts = explode( '-', $old_new );
