@@ -14,7 +14,6 @@
 	require_once get_stylesheet_directory() . '/functions/mailchimp/functions.php';
 	require_once get_stylesheet_directory() . '/functions/vouchers/functions.php';
 	require_once get_stylesheet_directory() . '/functions/subsites/brugge.php';
-	require_once get_stylesheet_directory() . '/functions/subsites/evergem.php';
 	require_once get_stylesheet_directory() . '/functions/subsites/hoeilaart.php';
 	require_once get_stylesheet_directory() . '/functions/subsites/vilvoorde.php';
 	
