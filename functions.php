@@ -4582,7 +4582,7 @@
 			return false;
 		}
 	}
-
+	
 	// Bereken de eerst mogelijke leverdatum voor de opgegeven verzendmethode (retourneert een timestamp)
 	function estimate_delivery_date( $shipping_id, $order_id = false ) {
 		// We gebruiken het geregistreerde besteltijdstip OF het live tijdstip voor schattingen van de leverdatum
@@ -4639,106 +4639,129 @@
 					do_action( 'qm/info', 'Chosen shop post ID: {id}', array( 'id' => $chosen_shop_node ) );
 				}
 				
-				if ( $chosen_shop_node === 'tuincentrum' ) {
-					if ( date_i18n( 'N', $from ) > 4 or ( date_i18n( 'N', $from ) == 4 and date_i18n( 'G', $from ) >= 12 ) ) {
-						// Na de deadline van donderdag 12u00: begin pas bij volgende werkdag, kwestie van zeker op volgende week uit te komen
-						$from = strtotime( '+1 weekday', $from );
-					}
+				switch ( $chosen_shop_node ) {
+					case 'atelier':
+						if ( wp_date( 'N', $from ) > 1 or ( wp_date( 'N', $from ) == 1 and wp_date( 'G', $from ) >= 12 ) ) {
+							// Na de deadline van maandag 12u00: begin pas bij volgende werkdag, kwestie van zeker op volgende week uit te komen
+							$from = strtotime( '+1 weekday', $from );
+							do_action( 'qm/info', 'We are after Mondag 12:00, start from: '.wp_date( 'c', $from ) );
+						} else {
+							do_action( 'qm/info', 'We are before Mondag 12:00, start from: '.wp_date( 'c', $from ) );
+						}
+						
+						// Zoek de eerste woensdag na de volgende middagdeadline
+						$timestamp = strtotime( 'next Wednesday', $from );
+						do_action( 'qm/info', 'Next Wednesday: '.wp_date( 'c', $timestamp ) );
+						
+						// Skip check op uitzonderlijke sluitingsdagen
+						return find_first_opening_hour( get_office_hours( $chosen_shop_node ), $timestamp );
+						
+					case 'stoasje':
+						if ( wp_date( 'N', $from ) > 3 or ( wp_date( 'N', $from ) == 3 and wp_date( 'G', $from ) >= 12 ) ) {
+							// Na de deadline van woensdag 12u00: begin pas bij volgende werkdag, kwestie van zeker op volgende week uit te komen
+							$from = strtotime( '+1 weekday', $from );
+							do_action( 'qm/info', 'We are after Wednesday 12:00, start from: '.wp_date( 'c', $from ) );
+						} else {
+							do_action( 'qm/info', 'We are before Wednesday 12:00, start from: '.wp_date( 'c', $from ) );
+						}
+						
+						// Zoek de eerste donderdag na de volgende middagdeadline
+						$timestamp = strtotime( 'next Thursday', $from );
+						do_action( 'qm/info', 'Next Thursday: '.wp_date( 'c', $timestamp ) );
+						
+						// Skip check op uitzonderlijke sluitingsdagen
+						return find_first_opening_hour( get_office_hours( $chosen_shop_node ), $timestamp );
 					
-					// Zoek de eerste vrijdag na de volgende middagdeadline
-					$timestamp = strtotime( 'next Friday', $from );
-				} elseif ( $chosen_shop_node === 'vorselaar' ) {
-					if ( date_i18n( 'N', $from ) > 4 ) {
-						// Na de deadline van donderdag 23u59: begin pas bij volgende werkdag, kwestie van zeker op volgende week uit te komen
-						$from = strtotime( '+1 weekday', $from );
-					}
-					
-					// Zoek de eerste vrijdag na de volgende middagdeadline (wordt wegens openingsuren automatisch zaterdagochtend)
-					$timestamp = strtotime( 'next Friday', $from );
-					
-					// Skip check op uitzonderlijke sluitingsdagen
-					return find_first_opening_hour( get_office_hours( $chosen_shop_node ), $timestamp );
-				} elseif ( $chosen_shop_node === 'stoasje' ) {
-					if ( date_i18n( 'N', $from ) > 3 or ( date_i18n( 'N', $from ) == 3 and date_i18n( 'G', $from ) >= 12 ) ) {
-						// Na de deadline van woensdag 12u00: begin pas bij volgende werkdag, kwestie van zeker op volgende week uit te komen
-						$from = strtotime( '+1 weekday', $from );
-						do_action( 'qm/info', 'We are after Wednesday 12:00, start from: '.date( 'c', $from ) );
-					} else {
-						do_action( 'qm/info', 'We are before Wednesday 12:00, start from: '.date( 'c', $from ) );
-					}
-					
-					// Zoek de eerste donderdag na de volgende middagdeadline
-					$timestamp = strtotime( 'next Thursday', $from );
-					do_action( 'qm/info', 'Next Thursday: '.date( 'c', $timestamp ) );
-					
-					// Skip check op uitzonderlijke sluitingsdagen
-					return find_first_opening_hour( get_office_hours( $chosen_shop_node ), $timestamp );
-				} elseif ( $chosen_shop_node == 291 ) {
-					// Meer marge voor Hoogstraten
-					if ( date_i18n( 'N', $from ) < 4 or ( date_i18n( 'N', $from ) == 7 and date_i18n( 'G', $from ) >= 22 ) ) {
-						// Na de deadline van zondag 22u00: begin pas bij 4de werkdag, kwestie van zeker op volgende week uit te komen
-						$from = strtotime( '+4 weekdays', $from );
-					}
-					
-					// Zoek de eerste donderdag na de volgende middagdeadline (wordt wegens openingsuren automatisch vrijdagochtend)
-					$timestamp = strtotime( 'next Thursday', $from );
-				} else {
-					$timestamp = get_first_working_day( $from );
-
-					// Geef nog twee extra werkdagen voor afhaling in niet-OWW-punten
-					if ( ! is_numeric( $chosen_shop_node ) ) {
-						$timestamp = strtotime( '+2 weekdays', $timestamp );
-					}
+					case 'tuincentrum':
+						if ( wp_date( 'N', $from ) > 4 or ( wp_date( 'N', $from ) == 4 and wp_date( 'G', $from ) >= 12 ) ) {
+							// Na de deadline van donderdag 12u00: begin pas bij volgende werkdag, kwestie van zeker op volgende week uit te komen
+							$from = strtotime( '+1 weekday', $from );
+						}
+						
+						// Zoek de eerste vrijdag na de volgende middagdeadline
+						$timestamp = strtotime( 'next Friday', $from );
+						
+						break;
+						
+					case 'vorselaar':
+						if ( wp_date( 'N', $from ) > 4 ) {
+							// Na de deadline van donderdag 23u59: begin pas bij volgende werkdag, kwestie van zeker op volgende week uit te komen
+							$from = strtotime( '+1 weekday', $from );
+						}
+						
+						// Zoek de eerste vrijdag na de volgende middagdeadline (wordt wegens openingsuren automatisch zaterdagochtend)
+						$timestamp = strtotime( 'next Friday', $from );
+						
+						// Skip check op uitzonderlijke sluitingsdagen
+						return find_first_opening_hour( get_office_hours( $chosen_shop_node ), $timestamp );
+						
+					case 291:
+						// Meer marge voor Hoogstraten
+						if ( wp_date( 'N', $from ) < 4 or ( wp_date( 'N', $from ) == 7 and wp_date( 'G', $from ) >= 22 ) ) {
+							// Na de deadline van zondag 22u00: begin pas bij 4de werkdag, kwestie van zeker op volgende week uit te komen
+							$from = strtotime( '+4 weekdays', $from );
+						}
+						
+						// Zoek de eerste donderdag na de volgende middagdeadline (wordt wegens openingsuren automatisch vrijdagochtend)
+						$timestamp = strtotime( 'next Thursday', $from );
+						
+						break;
+						
+					default:
+						$timestamp = get_first_working_day( $from );
+						
+						// Geef nog twee extra werkdagen voor afhaling in niet-OWW-punten
+						if ( ! is_numeric( $chosen_shop_node ) ) {
+							$timestamp = strtotime( '+2 weekdays', $timestamp );
+						}
 				}
-
+				
 				// Check of de winkel op deze dag effectief nog geopend is na 12u (tel er indien nodig dagen bij)
 				$timestamp = find_first_opening_hour( get_office_hours( $chosen_shop_node ), $timestamp );
-
-				do_action( 'qm/info', 'Estimate delivery (step 1): {date}', array( 'date' => date_i18n( 'Y-m-d H:i', $timestamp ) ) );
-
+				
+				do_action( 'qm/info', 'Estimate delivery (step 1): {date}', array( 'date' => wp_date( 'Y-m-d H:i', $timestamp ) ) );
+				
 				// Tel alle sluitingsdagen die in de verwerkingsperiode vallen (inclusief de eerstkomende openingsdag!) erbij
 				$timestamp = move_date_on_holidays( $from, $timestamp, $chosen_shop_node, true );
-
-				do_action( 'qm/info', 'Estimate delivery (step 2): {date}', array( 'date' => date_i18n( 'Y-m-d H:i', $timestamp ) ) );
-
+				
+				do_action( 'qm/info', 'Estimate delivery (step 2): {date}', array( 'date' => wp_date( 'Y-m-d H:i', $timestamp ) ) );
+				
 				// Check of de winkel ook op de nieuwe dag effectief nog geopend is na 12u
 				$timestamp = find_first_opening_hour( get_office_hours( $chosen_shop_node ), $timestamp );
-
-				do_action( 'qm/info', 'Estimate delivery (step 3): {date}', array( 'date' => date_i18n( 'Y-m-d H:i', $timestamp ) ) );
-
+				
+				do_action( 'qm/info', 'Estimate delivery (step 3): {date}', array( 'date' => wp_date( 'Y-m-d H:i', $timestamp ) ) );
+				
 				break;
-
+				
 			// Alle (gratis/betalende) instances van postpuntlevering en thuislevering
 			default:
 				if ( $chosen_shop_node == 242 ) {
 					// Voorlopig enkel thuislevering op woensdag bij Brussel
-					if ( ( date_i18n( 'N', $from ) == 5 and date_i18n( 'G', $from ) >= 15 ) or date_i18n( 'N', $from ) > 5 ) {
+					if ( ( wp_date( 'N', $from ) == 5 and wp_date( 'G', $from ) >= 15 ) or wp_date( 'N', $from ) > 5 ) {
 						// Na de deadline van vrijdag 15u00: begin pas bij 4de werkdag, kwestie van zeker op volgende week uit te komen
 						$from = strtotime( '+4 weekdays', $from );
 					} else {
 						// Tel er sowieso 2 werkdagen bij, zodat we op maandag en dinsdag ook doorschuiven naar de volgende week
 						$from = strtotime( '+2 weekdays', $from );
 					}
-
+					
 					// Zoek de eerste woensdag
 					$timestamp = strtotime( 'next Wednesday', $from );
 				} else {
 					// Zoek de eerste werkdag na de volgende middagdeadline
 					$timestamp = get_first_working_day( $from );
-
+					
 					// Geef nog twee extra werkdagen voor de thuislevering
 					$timestamp = strtotime( '+2 weekdays', $timestamp );
-
+					
 					// Tel feestdagen die in de verwerkingsperiode vallen erbij
 					$timestamp = move_date_on_holidays( $from, $timestamp, $chosen_shop_node );
 				}
-
-				break;
 		}
-
+		
 		return $timestamp;
 	}
-
+	
 	// Ontvangt een timestamp en antwoordt met eerste werkdag die er toe doet
 	function get_first_working_day( $from ) {
 		if ( date_i18n( 'N', $from ) < 6 and date_i18n( 'G', $from ) < 12 ) {

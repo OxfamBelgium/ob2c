@@ -492,18 +492,33 @@
 	
 	
 	// Stel de openingsuren in van een niet-OWW-afhaalpunt
-	$node = 'stoasje';
+	$node = 'atelier';
 	$hours = array(
-		1 => false,
-		2 => false,
-		3 => false,
-		4 => array(
+		1 => array(
 			array(
-				'start' => '14:30',
-				'end' => '19:00'
+				'start' => '10:00',
+				'end' => '12:00'
 			),
 		),
-		5 => false,
+		2 => false,
+		3 => array(
+			array(
+				'start' => '14:00',
+				'end' => '16:00'
+			),
+		),
+		4 => array(
+			array(
+				'start' => '14:00',
+				'end' => '16:00'
+			),
+		),
+		5 => array(
+			array(
+				'start' => '14:00',
+				'end' => '16:00'
+			),
+		),
 		6 => false,
 		7 => false,
 	);
