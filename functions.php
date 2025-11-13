@@ -4643,7 +4643,7 @@
 					case 'atelier':
 						if ( wp_date( 'N', $from ) > 1 or ( wp_date( 'N', $from ) == 1 and wp_date( 'G', $from ) >= 12 ) ) {
 							// Na de deadline van maandag 12u00: begin pas bij volgende werkdag, kwestie van zeker op volgende week uit te komen
-							$from = strtotime( '+1 weekday', $from );
+							$from = strtotime( '+2 weekdays', $from );
 							do_action( 'qm/info', 'We are after Mondag 12:00, start from: '.wp_date( 'c', $from ) );
 						} else {
 							do_action( 'qm/info', 'We are before Mondag 12:00, start from: '.wp_date( 'c', $from ) );
