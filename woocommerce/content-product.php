@@ -65,7 +65,7 @@ if ( ! $nm_theme_options['product_action_link'] ) {
             <li class="promo-banner horizontal">
                 <?php
                     $term_link = get_term_link( 'promotie', 'product_tag' );
-                    $image = '<img src="'.esc_attr( get_stylesheet_directory_uri().'/images/promoties/wijnfestival-2025-liggend.jpg' ).'" />';
+                    $image = '<img src="'.esc_attr( get_stylesheet_directory_uri().'/images/promoties/wijnfestival-2025-liggend-new.jpg' ).'" />';
                     
                     if ( ! is_wp_error( $term_link ) ) {
                         echo '<a href="'.esc_url( $term_link ).'#nm-shop-products">'.$image.'</a>';

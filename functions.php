@@ -5318,8 +5318,8 @@
 	}
 	
 	function get_oxfam_cheques_skus_array() {
-		// Geldig tot eind 2025 en 2026
-		return array( '19031', '19032', '19033', '19023', '19024', '19025' );
+		// Geldig tot eind 2025, 2026 en 2027
+		return array( '19031', '19032', '19033', '19023', '19024', '19025', '19017', '19018', '19019' );
 	}
 	
 	function get_oxfam_cheques_ids_array() {
