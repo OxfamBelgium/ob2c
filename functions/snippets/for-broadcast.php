@@ -373,6 +373,26 @@
 	
 	
 	
+	// Verwijder uitgefaseerde landen
+	$taxonomy = 'pa_countries';
+	if ( taxonomy_exists( $taxonomy ) ) {
+		$terms = array( 'indonesia' );
+		foreach ( $terms as $term ) {
+			$term_to_delete = get_term_by( 'slug', $term, $taxonomy );
+			if ( $term_to_delete !== false ) {
+				if ( wp_delete_term( $term_to_delete->term_id, $taxonomy ) ) {
+					write_log( get_bloginfo('name').": deleted '".$term_to_delete->name."' country" );
+				} else {
+					write_log( get_bloginfo('name').": could not delete '".$term_to_delete->name."' country" );
+				}
+			} else {
+				write_log( get_bloginfo('name').": country '".$term."' not found" );
+			}
+		}
+	}
+	
+	
+	
 	###########################
 	# OPZETTEN NIEUWE WEBSHOP #
 	###########################
