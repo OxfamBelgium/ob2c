@@ -7012,7 +7012,7 @@
 				$headers[] = 'From: "Helpdesk E-Commerce" <'.get_site_option('admin_email').'>';
 				$headers[] = 'Content-Type: text/html';
 				$body = '<p>Je taak voor deze maand zit er bijna op. Gelieve wel nog onderstaande producten uit te faseren: niet verwijderen (dat doen we pas als alle lokale voorraden uitgeput zijn en/of de laatst uitgeleverde THT-datum gepaseerd is!) maar wel de voorraad op 0 zetten en nabestellingen blokkeren (indien dit nog niet automatisch gebeurde) én de BestelWeb-dropdown op \'nee\' zetten.</p><ol><li>'.implode( '</li><li>', $products_to_deprecate ).'</li></ol><p>&nbsp;</p><p><i>Dit is een automatisch bericht.</i></p>';
-				wp_mail( array( 'kristof.beausaert@oft.be', 'info@fullstackahead.be' ), 'Hoera, de productimport is afgelopen!', '<html>'.$body.'</html>', $headers );
+				wp_mail( array( 'kristof.beausaert@oft.be', 'xafiatou.abdoul@oft.be', 'info@fullstackahead.be' ), 'Hoera, de productimport is afgelopen!', '<html>'.$body.'</html>', $headers );
 				write_log( "Lijst van ".count( $products_to_deprecate )." uit te faseren producten gemaild naar beheerders" );
 			}
 			

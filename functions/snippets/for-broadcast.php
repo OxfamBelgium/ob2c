@@ -46,7 +46,6 @@
 	
 	// Alle nieuwe artikels lokaal uit voorraad zetten
 	$new_skus = get_site_option( 'oxfam_shop_dashboard_notice_new_products', array() );
-	
 	if ( count( $new_skus ) > 0 and ! is_main_site() ) {
 		foreach ( $new_skus as $sku ) {
 			$product_id = wc_get_product_id_by_sku( $sku );
