@@ -3,7 +3,7 @@
 	<head>
 		<meta charset="UTF-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
-		<title>Tijdelijk gesloten &#124; Webshop Oxfam-Wereldwinkels</title>
+		<title>Wij zijn gesloten &#124; Webshop Oxfam-Wereldwinkels</title>
 		
 		<link rel="stylesheet" type="text/css" href="https://www.lecouperet.net/hcb/styles/style-normal.css">
 		<style>
@@ -63,7 +63,7 @@
 				</div>
 				<div style="height: 60%; box-sizing: border-box;" class="padding-fix">
 					<div id="typewriter" class="tikken-404">
-						Deze lokale webshop is <span id="rood">tijdelijk gesloten</span>.
+						Deze lokale webshop is <span id="rood">definitief gesloten</span>.
 						We sturen je door naar de portaalpagina, waar je de webshops vindt
 						die <span id="rood">wel nog actief</span> zijn en leveren naar jouw postcode.
 					</div>
