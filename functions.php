@@ -7007,18 +7007,25 @@
 			}
 			
 			ksort( $products_to_deprecate, SORT_NUMERIC );
-			if ( count( $products_to_deprecate ) > 0 ) {
-				$headers = array();
-				$headers[] = 'From: "Helpdesk E-Commerce" <'.get_site_option('admin_email').'>';
-				$headers[] = 'Content-Type: text/html';
-				$body = '<p>Je taak voor deze maand zit er bijna op. Gelieve wel nog onderstaande producten uit te faseren: niet verwijderen (dat doen we pas als alle lokale voorraden uitgeput zijn en/of de laatst uitgeleverde THT-datum gepaseerd is!) maar wel de voorraad op 0 zetten en nabestellingen blokkeren (indien dit nog niet automatisch gebeurde) én de BestelWeb-dropdown op \'nee\' zetten.</p><ol><li>'.implode( '</li><li>', $products_to_deprecate ).'</li></ol><p>&nbsp;</p><p><i>Dit is een automatisch bericht.</i></p>';
-				wp_mail( array( 'kristof.beausaert@oft.be', 'xafiatou.abdoul@oft.be', 'info@fullstackahead.be' ), 'Hoera, de productimport is afgelopen!', '<html>'.$body.'</html>', $headers );
-				write_log( "Lijst van ".count( $products_to_deprecate )." uit te faseren producten gemaild naar beheerders" );
-			}
 			
-			$old = WP_CONTENT_DIR."/erp-import.csv";
-			$new = WP_CONTENT_DIR."/erp-import-".date_i18n('Y-m-d').".csv";
-			rename( $old, $new );
+			$headers = array();
+			$headers[] = 'From: "Helpdesk E-Commerce" <'.get_site_option('admin_email').'>';
+			$headers[] = 'Content-Type: text/html';
+			
+			if ( count( $products_to_deprecate ) > 0 ) {
+				$body = '<p>Je taak voor deze maand zit er bijna op. Gelieve wel nog onderstaande producten uit te faseren: niet verwijderen (dat doen we pas als alle lokale voorraden uitgeput zijn en/of de laatst uitgeleverde THT-datum gepaseerd is!) maar wel de voorraad op 0 zetten en nabestellingen blokkeren (indien dit nog niet automatisch gebeurde) én de BestelWeb-dropdown op \'nee\' zetten.</p><ol><li>'.implode( '</li><li>', $products_to_deprecate ).'</li></ol>';
+			} else {
+				$body = '<p>Je taak voor deze maand zit erop! Er zijn geen producten uit te faseren.</p>';
+			}
+			$body .= '<p>&nbsp;</p><p><i>Dit is een automatisch bericht.</i></p>';
+			
+			wp_mail( array( 'kristof.beausaert@oft.be', 'xafiatou.abdoul@oft.be', 'info@fullstackahead.be' ), 'Hoera, de productimport is afgelopen!', '<html>'.$body.'</html>', $headers );
+			write_log( "Lijst van ".count( $products_to_deprecate )." uit te faseren producten gemaild naar beheerders" );
+			
+			// We uploaden de file niet langer naar de server
+			// $old = WP_CONTENT_DIR."/erp-import.csv";
+			// $new = WP_CONTENT_DIR."/erp-import-".date_i18n('Y-m-d').".csv";
+			// rename( $old, $new );
 		}
 	}
 	
