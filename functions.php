@@ -2782,7 +2782,7 @@
 		// En filter 'woocommerce_is_purchasable' blokkeert toevoegen van gratis mok tijdens de actie!
 		if ( $product_id == wc_get_product_id_by_sku('29020') and wp_date('Y-m-d') <= '2026-10-31' ) {
 			$passed_extra_conditions = false;
-			wc_add_notice( 'Deze koffiemok kan tijdens de kopjesactie niet aangekocht worden.', 'error' );
+			wc_add_notice( 'De koffiemok kan tijdens de kopjesactie niet aangekocht worden. Koop 1 kg Oxfam-koffie om een gratis exemplaar te ontvangen.', 'error' );
 		}
 		
 		return $passed_extra_conditions;
