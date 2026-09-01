@@ -12,7 +12,7 @@
 				$coffee_term = get_term_by( 'slug', $term, 'product_cat' );
 				if ( $coffee_term !== false ) {
 					if ( in_array( $coffee_term->term_id, $product->get_category_ids() ) ) {
-						$labels['promotion'] = 'Gratis mok bij aankoop van 1 kg';
+						$labels['promotion'] = 'Gratis mok per kilogram';
 						break;
 					}
 				}
