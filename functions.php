@@ -6784,19 +6784,23 @@
 				echo '</p>';
 			}
 			
-			if ( wp_date('Y-m-d') >= '2025-03-01' and wp_date('Y-m-d') <= '2025-03-31' ) {
-				$terms = array( 'bonen', 'gemalen', 'pads', 'instant' );
-				foreach ( $terms as $term ) {
-					$coffee_term = get_term_by( 'slug', $term, 'product_cat' );
-					if ( $coffee_term !== false ) {
-						if ( in_array( $coffee_term->term_id, $product->get_category_ids() ) ) {
-							echo '<p class="promotie">';
-								echo 'Gratis reep Bite to Fight-chocolade met koffieroom of geroosterde maïs bij elk pakje koffie! Voeg één of meerdere pakjes koffie toe, en kies de gewenste repen <a href="'.home_url('/winkelmandje/').'">op de winkelmandpagina</a>. Geldig t.e.m. 31 maart 2025 in alle Oxfam-Wereldwinkels en in onze webshops. <a class="dashicons dashicons-editor-help tooltip" title="Niet cumuleerbaar met andere acties. Niet van toepassing bij verkoop op factuur."></a>';
-							echo '</p>';
-							break;
+			// Tag automatisch alle producten die deelnemen aan de koffie-actie (oktober 2026)
+			if ( wp_date('Y-m-d') >= '2026-09-14' and wp_date('Y-m-d') <= '2026-10-31' ) {
+				$mok = wc_get_product( wc_get_product_id_by_sku('29020') );
+				if ( $mok !== false and $mok->get_stock_status() !== 'instock' ) {
+					$terms = array( 'bonen', 'gemalen' );
+					foreach ( $terms as $term ) {
+						$coffee_term = get_term_by( 'slug', $term, 'product_cat' );
+						if ( $coffee_term !== false ) {
+							if ( in_array( $coffee_term->term_id, $product->get_category_ids() ) ) {
+								echo '<p class="promotie">';
+									echo 'Gratis kunstige koffiemok bij aankoop van 1 kg Oxfam-koffie! Voeg vier pakjes van 250 g of één verpakking van 1 kg toe aan je winkelmandje. De mok wordt automatisch toegevoegd aan je bestelling. Geldig t.e.m. 31 oktober 2026 in alle Oxfam-Wereldwinkels en in onze webshops. <a class="dashicons dashicons-editor-help tooltip" title="Niet cumuleerbaar met andere acties. Niet van toepassing bij verkoop op factuur."></a>';
+								echo '</p>';
+								break;
+							}
 						}
 					}
-				}
+				ø
 			}
 		}
 	}

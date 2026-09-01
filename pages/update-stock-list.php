@@ -113,7 +113,7 @@
 							$content .= '<input class="toggle" type="checkbox" id="'.get_the_ID().'-featured" '.checked( $product->is_featured(), true, false ).'> <label for="'.get_the_ID().'-featured">In de kijker?</label>';
 						} else {
 							if ( $product->get_catalog_visibility() === 'hidden' ) {
-								$content .= '<small>NIET ZICHTBAAR</small>';
+								$content .= '<small>NIET ZICHTBAAR VOOR KLANTEN</small>';
 							}
 							if ( has_term( 'Grootverbruik', 'product_cat', get_the_ID() ) ) {
 								$content .= '<small>ENKEL ZICHTBAAR VOOR B2B-KLANTEN</small>';

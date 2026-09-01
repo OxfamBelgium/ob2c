@@ -109,13 +109,13 @@
 	}
 	
 	// Schakel kortingsbon met een gratis product uit als de webshop geen voorraad heeft
-	// add_action( 'wjecf_assert_coupon_is_valid', 'check_if_free_products_are_on_stock', 1000, 2 );
+	add_action( 'wjecf_assert_coupon_is_valid', 'check_if_free_products_are_on_stock', 1000, 2 );
 	
 	function check_if_free_products_are_on_stock( $coupon, $wc_discounts  ) {
-		if ( in_array( $coupon->get_code(), array( '202509-chips' ) ) and date_i18n('Y-m-d') < $coupon->get_date_expires()->date_i18n('Y-m-d') ) {
-			$yucachips = wc_get_product( wc_get_product_id_by_sku( '25409' ) );
-			if ( $yucachips !== false and $yucachips->get_stock_status() !== 'instock' ) {
-				throw new Exception( __( 'Deze webshop heeft helaas geen yucachips op voorraad. Gelieve een ander afhaalpunt te kiezen.', 'oxfam-webshop' ), 79106 );
+		if ( in_array( $coupon->get_code(), array( '2026-wvdft-250g', '2026-wvdft-1kg' ) ) and wp_date('Y-m-d') < $coupon->get_date_expires()->date_i18n('Y-m-d') ) {
+			$mok = wc_get_product( wc_get_product_id_by_sku('29020') );
+			if ( $mok !== false and $mok->get_stock_status() !== 'instock' ) {
+				throw new Exception( __( 'Deze webshop heeft helaas geen koffiemokken meer op voorraad. Gelieve een ander afhaalpunt te kiezen.', 'oxfam-webshop' ), 79106 );
 			}
 		}
 	}

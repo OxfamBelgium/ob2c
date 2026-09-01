@@ -5,13 +5,16 @@
 	// Tag automatisch alle producten die deelnemen aan de koffie-actie (oktober 2026)
 	// Het product hoeft dus niet in promo te staan!
 	if ( ! is_b2b_customer() and wp_date('Y-m-d') >= '2026-09-14' and wp_date('Y-m-d') <= '2026-10-31' ) {
-		$terms = array( 'bonen', 'gemalen' );
-		foreach ( $terms as $term ) {
-			$coffee_term = get_term_by( 'slug', $term, 'product_cat' );
-			if ( $coffee_term !== false ) {
-				if ( in_array( $coffee_term->term_id, $product->get_category_ids() ) ) {
-					$labels['promotion'] = 'Gratis mok bij aankoop van 1 kg';
-					break;
+		$mok = wc_get_product( wc_get_product_id_by_sku('29020') );
+		if ( $mok !== false and $mok->get_stock_status() !== 'instock' ) {
+			$terms = array( 'bonen', 'gemalen' );
+			foreach ( $terms as $term ) {
+				$coffee_term = get_term_by( 'slug', $term, 'product_cat' );
+				if ( $coffee_term !== false ) {
+					if ( in_array( $coffee_term->term_id, $product->get_category_ids() ) ) {
+						$labels['promotion'] = 'Gratis mok bij aankoop van 1 kg';
+						break;
+					}
 				}
 			}
 		}
