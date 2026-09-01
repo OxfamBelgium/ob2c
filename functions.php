@@ -2769,17 +2769,25 @@
 
 	// Filter wordt enkel doorlopen bij de 1ste toevoeging van een product!
 	add_filter( 'woocommerce_add_to_cart_validation', 'ob2c_disallow_products_not_in_assortment', 10, 2 );
-
+	
 	function ob2c_disallow_products_not_in_assortment( $passed, $product_id ) {
 		$passed_extra_conditions = apply_filters( 'ob2c_product_is_available', $product_id, is_b2b_customer(), $passed );
-
+		
 		if ( $passed and ! $passed_extra_conditions ) {
 			wc_add_notice( sprintf( __( 'Foutmelding indien een gewone klant een B2B-product probeert te bestellen.', 'oxfam-webshop' ), is_b2b_customer() ), 'error' );
 		}
-
+		
+		// Maak de koffiemok onaankoopbaar tot de WVDFT-actie voorbij is
+		// Zichtbaarheid 'verborgen' volstaat niet om toevoegen aan winkelmandje te verhinderen ...
+		// En filter 'woocommerce_is_purchasable' blokkeert toevoegen van gratis mok tijdens de actie!
+		if ( $product_id == wc_get_product_id_by_sku('29020') and wp_date('Y-m-d') <= '2026-10-31' ) {
+			$passed_extra_conditions = false;
+			wc_add_notice( 'Deze koffiemok kan tijdens de kopjesactie niet aangekocht worden.', 'error' );
+		}
+		
 		return $passed_extra_conditions;
 	}
-
+	
 	// Maak de detailpagina van verboden producten volledig onbereikbaar
 	add_action( 'template_redirect', 'ob2c_prevent_access_to_product_page' );
 
