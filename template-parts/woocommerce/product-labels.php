@@ -6,7 +6,7 @@
 	// Het product hoeft dus niet in promo te staan!
 	if ( ! is_b2b_customer() and wp_date('Y-m-d') >= '2026-09-02' and wp_date('Y-m-d') <= '2026-10-31' ) {
 		$mok = wc_get_product( wc_get_product_id_by_sku('29020') );
-		if ( $mok !== false and $mok->get_stock_status() !== 'instock' ) {
+		if ( $mok !== false and $mok->get_stock_status() === 'instock' ) {
 			$terms = array( 'bonen', 'gemalen' );
 			foreach ( $terms as $term ) {
 				$coffee_term = get_term_by( 'slug', $term, 'product_cat' );
