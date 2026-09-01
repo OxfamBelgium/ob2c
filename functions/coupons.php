@@ -120,17 +120,16 @@
 		}
 	}
 	
-	// Maak de koffiemok onaankoopbaar tot de WVDFT-actie voorbij is door de button te verbergen
-	// Zichtbaarheid 'verborgen' volstaat niet om toevoegen aan winkelmandje te verhinderen ...
-	// Filter 'woocommerce_is_purchasable' blokkeert ook toevoegen van gratis mok tijdens de actie!
-	add_filter( 'woocommerce_loop_add_to_cart_link', 'disable_coffee_mug_sales_until_action_finished', 1000, 3 );
+	// Maak de koffiemok onaankoopbaar tot de WVDFT-actie voorbij is
+	// 'Verborgen'-zichtbaarheid volstaat niet om toevoegen aan winkelmandje te verhinderen!
+	add_filter( 'woocommerce_is_purchasable', 'disable_coffee_mug_sales_until_action_finished', 1000, 2 );
 	
-	function disable_coffee_mug_sales_until_action_finished( $html, $product, $args ) {
+	function disable_coffee_mug_sales_until_action_finished( $is_purchasable, $product ) {
 		if ( $product->get_sku() == '29020' and wp_date('Y-m-d') <= '2026-10-31' ) {
-			$html = '';
+			$is_purchasable = false;
 		}
 		
-		return $html;
+		return $is_purchasable;
 	}
 	
 	// Probeer wijnduo's enkel toe te passen op gelijke paren (dus niet 3+1, 5+1, 5+3, ...)
