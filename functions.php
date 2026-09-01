@@ -6794,7 +6794,7 @@
 						if ( $coffee_term !== false ) {
 							if ( in_array( $coffee_term->term_id, $product->get_category_ids() ) ) {
 								echo '<p class="promotie">';
-									echo 'Gratis kunstige koffiemok bij aankoop van 1 kg Oxfam-koffie! Voeg vier pakjes van 250 g of één verpakking van 1 kg toe aan je winkelmandje. De mok wordt automatisch toegevoegd aan je bestelling. Geldig t.e.m. 31 oktober 2026 in alle Oxfam-Wereldwinkels en in onze webshops. <a class="dashicons dashicons-editor-help tooltip" title="Niet cumuleerbaar met andere acties. Niet van toepassing bij verkoop op factuur."></a>';
+									echo 'Gratis kunstige koffiemok per aankoop van 1 kg Oxfam-koffie! Voeg vier pakjes van 250 g of één verpakking van 1 kg toe aan je winkelmandje. De tas t.w.v. '.$mok->get_price_html().' wordt automatisch toegevoegd aan je bestelling. Geldig t.e.m. 31 oktober 2026 in alle Oxfam-Wereldwinkels en in onze webshops. <a class="dashicons dashicons-editor-help tooltip" title="Niet cumuleerbaar met andere acties. Niet van toepassing bij verkoop op factuur."></a>';
 								echo '</p>';
 								break;
 							}
