@@ -2,20 +2,20 @@
 	global $product;
 	$labels = array();
 	
-	// Tag automatisch alle producten die deelnemen aan de koffie-actie (maart 2025)
+	// Tag automatisch alle producten die deelnemen aan de koffie-actie (oktober 2026)
 	// Het product hoeft dus niet in promo te staan!
-	// if ( ! is_b2b_customer() and wp_date('Y-m-d') >= '2025-03-01' and wp_date('Y-m-d') <= '2025-03-31' ) {
-	// 	$terms = array( 'bonen', 'gemalen', 'pads', 'instant' );
-	// 	foreach ( $terms as $term ) {
-	// 		$coffee_term = get_term_by( 'slug', $term, 'product_cat' );
-	// 		if ( $coffee_term !== false ) {
-	// 			if ( in_array( $coffee_term->term_id, $product->get_category_ids() ) ) {
-	// 				$labels['promotion'] = 'Gratis reep chocolade';
-	// 				break;
-	// 			}
-	// 		}
-	// 	}
-	// }
+	if ( ! is_b2b_customer() and wp_date('Y-m-d') >= '2026-09-14' and wp_date('Y-m-d') <= '2026-10-31' ) {
+		$terms = array( 'bonen', 'gemalen' );
+		foreach ( $terms as $term ) {
+			$coffee_term = get_term_by( 'slug', $term, 'product_cat' );
+			if ( $coffee_term !== false ) {
+				if ( in_array( $coffee_term->term_id, $product->get_category_ids() ) ) {
+					$labels['promotion'] = 'Gratis mok bij aankoop van 1 kg';
+					break;
+				}
+			}
+		}
+	}
 	
 	if ( ! is_b2b_customer() and $product->is_on_sale() ) {
 		// Neem algemeen label als default

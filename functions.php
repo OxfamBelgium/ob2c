@@ -6099,14 +6099,15 @@
 			'oxfam_export_used_vouchers_callback'
 		);
 		
-		add_submenu_page(
-			'woonet-woocommerce',
-			'Voucher Lookup',
-			'Voucher Lookup',
-			'create_sites',
-			'woonet-woocommerce-voucher-lookup',
-			'oxfam_voucher_lookup_callback'
-		);
+		// Nog niet uitgewerkt
+		// add_submenu_page(
+		// 	'woonet-woocommerce',
+		// 	'Voucher Lookup',
+		// 	'Voucher Lookup',
+		// 	'create_sites',
+		// 	'woonet-woocommerce-voucher-lookup',
+		// 	'oxfam_voucher_lookup_callback'
+		// );
 		
 		add_submenu_page(
 			'woonet-woocommerce',
@@ -7013,19 +7014,19 @@
 			$headers[] = 'Content-Type: text/html';
 			
 			if ( count( $products_to_deprecate ) > 0 ) {
-				$body = '<p>Je taak voor deze maand zit er bijna op. Gelieve wel nog onderstaande producten uit te faseren: niet verwijderen (dat doen we pas als alle lokale voorraden uitgeput zijn en/of de laatst uitgeleverde THT-datum gepaseerd is!) maar wel de voorraad op 0 zetten en nabestellingen blokkeren (indien dit nog niet automatisch gebeurde) én de BestelWeb-dropdown op \'nee\' zetten.</p><ol><li>'.implode( '</li><li>', $products_to_deprecate ).'</li></ol>';
+				$body = '<p>Je taak voor deze maand zit er bijna op.<p><p>Gelieve wel nog onderstaande producten uit te faseren: niet verwijderen (dat doen we pas als alle lokale voorraden uitgeput zijn en/of de laatst uitgeleverde THT-datum gepaseerd is!) maar wel de voorraad op 0 zetten en nabestellingen blokkeren (indien dit nog niet automatisch gebeurde) én de BestelWeb-dropdown op \'nee\' zetten. Zo worden ze onzichtbaar op het hoofdniveau én kleuren ze oranje in het lokale voorraadbeheer.</p><ol><li>'.implode( '</li><li>', $products_to_deprecate ).'</li></ol>';
 			} else {
-				$body = '<p>Je taak voor deze maand zit erop! Er zijn geen producten uit te faseren.</p>';
+				$body = '<p>Je taak voor deze maand zit erop!</p><p>Er zijn geen producten uit te faseren.</p>';
 			}
 			$body .= '<p>&nbsp;</p><p><i>Dit is een automatisch bericht.</i></p>';
 			
 			wp_mail( array( 'kristof.beausaert@oft.be', 'xafiatou.abdoul@oft.be', 'info@fullstackahead.be' ), 'Hoera, de productimport is afgelopen!', '<html>'.$body.'</html>', $headers );
 			write_log( "Lijst van ".count( $products_to_deprecate )." uit te faseren producten gemaild naar beheerders" );
 			
-			// We uploaden de file niet langer naar de server
-			// $old = WP_CONTENT_DIR."/erp-import.csv";
-			// $new = WP_CONTENT_DIR."/erp-import-".date_i18n('Y-m-d').".csv";
-			// rename( $old, $new );
+			// Hernoem de file indien ze geüpload werd naar de server
+			$old = WP_CONTENT_DIR."/erp-import.csv";
+			$new = WP_CONTENT_DIR."/erp-import-".wp_date('Y-m-d').".csv";
+			rename( $old, $new );
 		}
 	}
 	
