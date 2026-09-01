@@ -46,8 +46,7 @@
 			// Query alle gepubliceerde producten, orden op ompaknummer
 			$args = array(
 				'post_type'			=> 'product',
-				// Tijdelijk ook privé-producten opvragen voor de koffiemokactie (WVDFT 2026)
-				'post_status'		=> array( 'publish', 'private' ),
+				'post_status'		=> array('publish'),
 				'posts_per_page'	=> -1,
 				'meta_key'			=> '_sku',
 				'orderby'			=> 'meta_value',
@@ -112,12 +111,13 @@
 						$content .= '<div class="cell">';
 						if ( $product->get_catalog_visibility() !== 'hidden' and ! has_term( 'Grootverbruik', 'product_cat', get_the_ID() ) ) {
 							$content .= '<input class="toggle" type="checkbox" id="'.get_the_ID().'-featured" '.checked( $product->is_featured(), true, false ).'> <label for="'.get_the_ID().'-featured">In de kijker?</label>';
-						}
-						if ( $product->get_status() === 'private' ) {
-							$content .= '<small>NIET ZICHTBAAR VOOR KLANTEN</small>';
-						}
-						if ( has_term( 'Grootverbruik', 'product_cat', get_the_ID() ) ) {
-							$content .= '<small>ENKEL ZICHTBAAR VOOR B2B-KLANTEN</small>';
+						} else {
+							if ( $product->get_catalog_visibility() === 'hidden' ) {
+								$content .= '<small>NIET ZICHTBAAR</small>';
+							}
+							if ( has_term( 'Grootverbruik', 'product_cat', get_the_ID() ) ) {
+								$content .= '<small>ENKEL ZICHTBAAR VOOR B2B-KLANTEN</small>';
+							}
 						}
 						$content .= '</div>';
 					$content .= '<div class="cell output"></div>';
