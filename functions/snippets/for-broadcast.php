@@ -392,6 +392,26 @@
 	
 	
 	
+	// Verwijder uitgefaseerde merken
+	$taxonomy = 'pa_merk';
+	if ( taxonomy_exists( $taxonomy ) ) {
+		$terms = array( 'ananas-en-limoen-ideaal-bij-vis-amp-zeevruchten', 'caprimo', 'bioviva', 'baya', 'eza', 'jura', 'marcels-green-soap', 'londji', 'traidcraft', 'van-houten' );
+		foreach ( $terms as $term ) {
+			$term_to_delete = get_term_by( 'slug', $term, $taxonomy );
+			if ( $term_to_delete !== false ) {
+				if ( wp_delete_term( $term_to_delete->term_id, $taxonomy ) ) {
+					write_log( get_bloginfo('name').": deleted '".$term_to_delete->name."' brand" );
+				} else {
+					write_log( get_bloginfo('name').": could not delete '".$term_to_delete->name."' brand" );
+				}
+			} else {
+				write_log( get_bloginfo('name').": brand '".$term."' not found" );
+			}
+		}
+	}
+	
+	
+	
 	###########################
 	# OPZETTEN NIEUWE WEBSHOP #
 	###########################
