@@ -18,6 +18,10 @@
 		
 		foreach ( $sites as $site ) {
 			switch_to_blog( $site->blog_id );
+			
+			// Forceer herberekening bij openen van deze pagina
+			delete_transient('oxfam_covered_zips');
+			
 			foreach ( get_oxfam_covered_zips() as $zip ) {
 				if ( array_key_exists( $zip, $list ) ) {
 					$list[ $zip ][] = get_webshop_name(true);

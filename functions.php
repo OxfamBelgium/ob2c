@@ -16,7 +16,8 @@
 	require_once get_stylesheet_directory() . '/functions/mailchimp/functions.php';
 	require_once get_stylesheet_directory() . '/functions/vouchers/functions.php';
 	require_once get_stylesheet_directory() . '/functions/subsites/brugge.php';
-	require_once get_stylesheet_directory() . '/functions/subsites/evergem.php';
+	require_once get_stylesheet_directory() . '/functions/subsites/hoeilaart.php';
+	require_once get_stylesheet_directory() . '/functions/subsites/vilvoorde.php';
 	
 	
 	
@@ -484,7 +485,7 @@
 		// @toDo: Attributen komen niet consequent door op subsites, check import
 		if ( is_main_site() ) {
 			echo '<div class="small-container"><div class="row">';
-				if ( is_product_category( array( 'koffie', 'bonen', 'gemalen', 'capsules', 'pads' ) ) ) {
+				if ( is_product_category( array( 'koffie', 'bonen', 'gemalen', 'pads' ) ) ) {
 					echo '<div class="col-md-3 supplementary-filter">';
 						$args = array(
 							'display_type' => 'dropdown',
@@ -1219,35 +1220,35 @@
 
 	function wpsl_change_results_sorting( $store_data ) {
 		$results_contain_delivery_store = false;
-
+		
 		foreach ( $store_data as $key => $row ) {
 			// Formatteer de afstand op z'n Belgisch
 			$store_data[ $key ]['distance'] = round( $row['distance'], 0 );
-
+			
 			// Check of er een resultaat is dat thuislevering organiseert
-			if ( strpos( $store_data[ $key ]['delivery'], 'delivery active' ) !== false ) {
+			if ( strpos( $row['delivery'], 'delivery active' ) !== false ) {
 				$results_contain_delivery_store = true;
 			}
 		}
-
+		
 		// Injecteer de thuisleverwinkel indien die nog niet tussen de resultaten zit (ongeacht de afstand)
 		if ( ! $results_contain_delivery_store ) {
 			// Numerieke keys, dus elementen worden niet overschreven
 			// Array wordt niet meer gesorteerd, dus dit bepaalt ook de volgorde
 			$store_data = array_merge( get_default_webshop_for_home_delivery(), $store_data );
 		}
-
+		
 		$custom_sort = array();
 		foreach ( $store_data as $key => $row ) {
 			// Winkels zonder webshop-URL (= lege string) onderaan plaatsen
 			// Key bestaat niet indien de winkel geen webshop heeft!
 			// $custom_sort[ $key ] = ! empty( $row['webshop'] ) ? $row['webshop'] : '';
-
+			
 			// Sorteer nog eens opnieuw op afstand
 			$custom_sort[ $key ] = ! empty( $row['distance'] ) ? $row['distance'] : 0;
 		}
 		array_multisort( $custom_sort, SORT_ASC, SORT_REGULAR, $store_data );
-
+		
 		// if ( current_user_can('update_core') ) {
 		// 	write_log( print_r( $store_data, true ) );
 		// }
@@ -1263,14 +1264,15 @@
 
 	function get_default_webshop_for_home_delivery() {
 		$store_data = array();
-
+		
 		if ( class_exists('WPSL_Frontend') ) {
 			$wpsl_frontend = new WPSL_Frontend();
-
+			
 			// Haal de gezochte postcode op uit cookie
 			if ( ! empty( $_COOKIE['current_location'] ) ) {
 				$current_location = intval( $_COOKIE['current_location'] );
 				$all_stores_by_postcode = get_webshops_by_postcode(true);
+				
 				if ( array_key_exists( $current_location, $all_stores_by_postcode ) ) {
 					$store = new stdClass();
 					$store->ID = $all_stores_by_postcode[ $current_location ];
@@ -1278,7 +1280,7 @@
 					$store->distance = 3;
 					// $store->lat en $store->lng mogen we weglaten, wordt later opgevuld
 					write_log( "Ontbrekende thuisleverwinkel met store-ID ".$store->ID." toegevoegd aan resultatenlijst voor ".$current_location );
-
+					
 					$stores = array();
 					$stores[] = $store;
 					// Dit vult alle andere velden aan, ook de custom dynamische
@@ -1286,7 +1288,7 @@
 				}
 			}
 		}
-
+		
 		return $store_data;
 	}
 
@@ -2640,17 +2642,25 @@
 
 	// Filter wordt enkel doorlopen bij de 1ste toevoeging van een product!
 	add_filter( 'woocommerce_add_to_cart_validation', 'ob2c_disallow_products_not_in_assortment', 10, 2 );
-
+	
 	function ob2c_disallow_products_not_in_assortment( $passed, $product_id ) {
 		$passed_extra_conditions = apply_filters( 'ob2c_product_is_available', $product_id, is_b2b_customer(), $passed );
-
+		
 		if ( $passed and ! $passed_extra_conditions ) {
 			wc_add_notice( sprintf( __( 'Foutmelding indien een gewone klant een B2B-product probeert te bestellen.', 'oxfam-webshop' ), is_b2b_customer() ), 'error' );
 		}
-
+		
+		// Maak de koffiemok onaankoopbaar tot de WVDFT-actie voorbij is
+		// Zichtbaarheid 'verborgen' volstaat niet om toevoegen aan winkelmandje te verhinderen ...
+		// En filter 'woocommerce_is_purchasable' blokkeert toevoegen van gratis mok tijdens de actie!
+		if ( $product_id == wc_get_product_id_by_sku('29020') and wp_date('Y-m-d') <= '2026-10-31' ) {
+			$passed_extra_conditions = false;
+			wc_add_notice( 'De koffiemok kan tijdens de kopjesactie niet aangekocht worden. Koop 1 kg Oxfam-koffie om een gratis exemplaar te ontvangen.', 'error' );
+		}
+		
 		return $passed_extra_conditions;
 	}
-
+	
 	// Maak de detailpagina van verboden producten volledig onbereikbaar
 	add_action( 'template_redirect', 'ob2c_prevent_access_to_product_page' );
 
@@ -3796,7 +3806,7 @@
 					<th><label for="<?php echo $check_key; ?>">Geverifieerde bedrijfsklant</label></th>
 					<td>
 						<input type="checkbox" class="important-b2b-field" name="<?php echo $check_key; ?>" id="<?php echo $check_key; ?>" value="yes" <?php checked( $is_b2b_customer, 'yes' ); ?> />
-						<span class="description">Indien aangevinkt moet (en kan) de klant niet op voorhand online betalen. Je maakt zelf een factuur op met de effectief geleverde goederen en volgt achteraf de betaling op. <a href="https://github.com/OxfamFairTrade/ob2c/wiki/8.-B2B-verkoop" target="_blank">Raadpleeg de handleiding.</a></span>
+						<span class="description">Indien aangevinkt moet (en kan) de klant niet op voorhand online betalen. Je maakt zelf een factuur op met de effectief geleverde goederen en volgt achteraf de betaling op. <a href="https://github.com/OxfamBelgium/ob2c/wiki/8.-B2B-verkoop" target="_blank">Raadpleeg de handleiding.</a></span>
 					</td>
 				</tr>
 				<tr class="show-if-b2b-checked">
@@ -4439,7 +4449,7 @@
 			return false;
 		}
 	}
-
+	
 	// Bereken de eerst mogelijke leverdatum voor de opgegeven verzendmethode (retourneert een timestamp)
 	function estimate_delivery_date( $shipping_id, $order_id = false ) {
 		// We gebruiken het geregistreerde besteltijdstip OF het live tijdstip voor schattingen van de leverdatum
@@ -4496,106 +4506,129 @@
 					do_action( 'qm/info', 'Chosen shop post ID: {id}', array( 'id' => $chosen_shop_node ) );
 				}
 				
-				if ( $chosen_shop_node === 'tuincentrum' ) {
-					if ( date_i18n( 'N', $from ) > 4 or ( date_i18n( 'N', $from ) == 4 and date_i18n( 'G', $from ) >= 12 ) ) {
-						// Na de deadline van donderdag 12u00: begin pas bij volgende werkdag, kwestie van zeker op volgende week uit te komen
-						$from = strtotime( '+1 weekday', $from );
-					}
+				switch ( $chosen_shop_node ) {
+					case 'atelier':
+						if ( wp_date( 'N', $from ) > 1 or ( wp_date( 'N', $from ) == 1 and wp_date( 'G', $from ) >= 12 ) ) {
+							// Na de deadline van maandag 12u00: begin pas bij volgende werkdag, kwestie van zeker op volgende week uit te komen
+							$from = strtotime( '+2 weekdays', $from );
+							do_action( 'qm/info', 'We are after Mondag 12:00, start from: '.wp_date( 'c', $from ) );
+						} else {
+							do_action( 'qm/info', 'We are before Mondag 12:00, start from: '.wp_date( 'c', $from ) );
+						}
+						
+						// Zoek de eerste woensdag na de volgende middagdeadline
+						$timestamp = strtotime( 'next Wednesday', $from );
+						do_action( 'qm/info', 'Next Wednesday: '.wp_date( 'c', $timestamp ) );
+						
+						// Skip check op uitzonderlijke sluitingsdagen
+						return find_first_opening_hour( get_office_hours( $chosen_shop_node ), $timestamp );
+						
+					case 'stoasje':
+						if ( wp_date( 'N', $from ) > 3 or ( wp_date( 'N', $from ) == 3 and wp_date( 'G', $from ) >= 12 ) ) {
+							// Na de deadline van woensdag 12u00: begin pas bij volgende werkdag, kwestie van zeker op volgende week uit te komen
+							$from = strtotime( '+1 weekday', $from );
+							do_action( 'qm/info', 'We are after Wednesday 12:00, start from: '.wp_date( 'c', $from ) );
+						} else {
+							do_action( 'qm/info', 'We are before Wednesday 12:00, start from: '.wp_date( 'c', $from ) );
+						}
+						
+						// Zoek de eerste donderdag na de volgende middagdeadline
+						$timestamp = strtotime( 'next Thursday', $from );
+						do_action( 'qm/info', 'Next Thursday: '.wp_date( 'c', $timestamp ) );
+						
+						// Skip check op uitzonderlijke sluitingsdagen
+						return find_first_opening_hour( get_office_hours( $chosen_shop_node ), $timestamp );
 					
-					// Zoek de eerste vrijdag na de volgende middagdeadline
-					$timestamp = strtotime( 'next Friday', $from );
-				} elseif ( $chosen_shop_node === 'vorselaar' ) {
-					if ( date_i18n( 'N', $from ) > 4 ) {
-						// Na de deadline van donderdag 23u59: begin pas bij volgende werkdag, kwestie van zeker op volgende week uit te komen
-						$from = strtotime( '+1 weekday', $from );
-					}
-					
-					// Zoek de eerste vrijdag na de volgende middagdeadline (wordt wegens openingsuren automatisch zaterdagochtend)
-					$timestamp = strtotime( 'next Friday', $from );
-					
-					// Skip check op uitzonderlijke sluitingsdagen
-					return find_first_opening_hour( get_office_hours( $chosen_shop_node ), $timestamp );
-				} elseif ( $chosen_shop_node === 'stoasje' ) {
-					if ( date_i18n( 'N', $from ) > 3 or ( date_i18n( 'N', $from ) == 3 and date_i18n( 'G', $from ) >= 12 ) ) {
-						// Na de deadline van woensdag 12u00: begin pas bij volgende werkdag, kwestie van zeker op volgende week uit te komen
-						$from = strtotime( '+1 weekday', $from );
-						do_action( 'qm/info', 'We are after Wednesday 12:00, start from: '.date( 'c', $from ) );
-					} else {
-						do_action( 'qm/info', 'We are before Wednesday 12:00, start from: '.date( 'c', $from ) );
-					}
-					
-					// Zoek de eerste donderdag na de volgende middagdeadline
-					$timestamp = strtotime( 'next Thursday', $from );
-					do_action( 'qm/info', 'Next Thursday: '.date( 'c', $timestamp ) );
-					
-					// Skip check op uitzonderlijke sluitingsdagen
-					return find_first_opening_hour( get_office_hours( $chosen_shop_node ), $timestamp );
-				} elseif ( $chosen_shop_node == 291 ) {
-					// Meer marge voor Hoogstraten
-					if ( date_i18n( 'N', $from ) < 4 or ( date_i18n( 'N', $from ) == 7 and date_i18n( 'G', $from ) >= 22 ) ) {
-						// Na de deadline van zondag 22u00: begin pas bij 4de werkdag, kwestie van zeker op volgende week uit te komen
-						$from = strtotime( '+4 weekdays', $from );
-					}
-					
-					// Zoek de eerste donderdag na de volgende middagdeadline (wordt wegens openingsuren automatisch vrijdagochtend)
-					$timestamp = strtotime( 'next Thursday', $from );
-				} else {
-					$timestamp = get_first_working_day( $from );
-
-					// Geef nog twee extra werkdagen voor afhaling in niet-OWW-punten
-					if ( ! is_numeric( $chosen_shop_node ) ) {
-						$timestamp = strtotime( '+2 weekdays', $timestamp );
-					}
+					case 'tuincentrum':
+						if ( wp_date( 'N', $from ) > 4 or ( wp_date( 'N', $from ) == 4 and wp_date( 'G', $from ) >= 12 ) ) {
+							// Na de deadline van donderdag 12u00: begin pas bij volgende werkdag, kwestie van zeker op volgende week uit te komen
+							$from = strtotime( '+1 weekday', $from );
+						}
+						
+						// Zoek de eerste vrijdag na de volgende middagdeadline
+						$timestamp = strtotime( 'next Friday', $from );
+						
+						break;
+						
+					case 'vorselaar':
+						if ( wp_date( 'N', $from ) > 4 ) {
+							// Na de deadline van donderdag 23u59: begin pas bij volgende werkdag, kwestie van zeker op volgende week uit te komen
+							$from = strtotime( '+1 weekday', $from );
+						}
+						
+						// Zoek de eerste vrijdag na de volgende middagdeadline (wordt wegens openingsuren automatisch zaterdagochtend)
+						$timestamp = strtotime( 'next Friday', $from );
+						
+						// Skip check op uitzonderlijke sluitingsdagen
+						return find_first_opening_hour( get_office_hours( $chosen_shop_node ), $timestamp );
+						
+					case 291:
+						// Meer marge voor Hoogstraten
+						if ( wp_date( 'N', $from ) < 4 or ( wp_date( 'N', $from ) == 7 and wp_date( 'G', $from ) >= 22 ) ) {
+							// Na de deadline van zondag 22u00: begin pas bij 4de werkdag, kwestie van zeker op volgende week uit te komen
+							$from = strtotime( '+4 weekdays', $from );
+						}
+						
+						// Zoek de eerste donderdag na de volgende middagdeadline (wordt wegens openingsuren automatisch vrijdagochtend)
+						$timestamp = strtotime( 'next Thursday', $from );
+						
+						break;
+						
+					default:
+						$timestamp = get_first_working_day( $from );
+						
+						// Geef nog twee extra werkdagen voor afhaling in niet-OWW-punten
+						if ( ! is_numeric( $chosen_shop_node ) ) {
+							$timestamp = strtotime( '+2 weekdays', $timestamp );
+						}
 				}
-
+				
 				// Check of de winkel op deze dag effectief nog geopend is na 12u (tel er indien nodig dagen bij)
 				$timestamp = find_first_opening_hour( get_office_hours( $chosen_shop_node ), $timestamp );
-
-				do_action( 'qm/info', 'Estimate delivery (step 1): {date}', array( 'date' => date_i18n( 'Y-m-d H:i', $timestamp ) ) );
-
+				
+				do_action( 'qm/info', 'Estimate delivery (step 1): {date}', array( 'date' => wp_date( 'Y-m-d H:i', $timestamp ) ) );
+				
 				// Tel alle sluitingsdagen die in de verwerkingsperiode vallen (inclusief de eerstkomende openingsdag!) erbij
 				$timestamp = move_date_on_holidays( $from, $timestamp, $chosen_shop_node, true );
-
-				do_action( 'qm/info', 'Estimate delivery (step 2): {date}', array( 'date' => date_i18n( 'Y-m-d H:i', $timestamp ) ) );
-
+				
+				do_action( 'qm/info', 'Estimate delivery (step 2): {date}', array( 'date' => wp_date( 'Y-m-d H:i', $timestamp ) ) );
+				
 				// Check of de winkel ook op de nieuwe dag effectief nog geopend is na 12u
 				$timestamp = find_first_opening_hour( get_office_hours( $chosen_shop_node ), $timestamp );
-
-				do_action( 'qm/info', 'Estimate delivery (step 3): {date}', array( 'date' => date_i18n( 'Y-m-d H:i', $timestamp ) ) );
-
+				
+				do_action( 'qm/info', 'Estimate delivery (step 3): {date}', array( 'date' => wp_date( 'Y-m-d H:i', $timestamp ) ) );
+				
 				break;
-
+				
 			// Alle (gratis/betalende) instances van postpuntlevering en thuislevering
 			default:
 				if ( $chosen_shop_node == 242 ) {
 					// Voorlopig enkel thuislevering op woensdag bij Brussel
-					if ( ( date_i18n( 'N', $from ) == 5 and date_i18n( 'G', $from ) >= 15 ) or date_i18n( 'N', $from ) > 5 ) {
+					if ( ( wp_date( 'N', $from ) == 5 and wp_date( 'G', $from ) >= 15 ) or wp_date( 'N', $from ) > 5 ) {
 						// Na de deadline van vrijdag 15u00: begin pas bij 4de werkdag, kwestie van zeker op volgende week uit te komen
 						$from = strtotime( '+4 weekdays', $from );
 					} else {
 						// Tel er sowieso 2 werkdagen bij, zodat we op maandag en dinsdag ook doorschuiven naar de volgende week
 						$from = strtotime( '+2 weekdays', $from );
 					}
-
+					
 					// Zoek de eerste woensdag
 					$timestamp = strtotime( 'next Wednesday', $from );
 				} else {
 					// Zoek de eerste werkdag na de volgende middagdeadline
 					$timestamp = get_first_working_day( $from );
-
+					
 					// Geef nog twee extra werkdagen voor de thuislevering
 					$timestamp = strtotime( '+2 weekdays', $timestamp );
-
+					
 					// Tel feestdagen die in de verwerkingsperiode vallen erbij
 					$timestamp = move_date_on_holidays( $from, $timestamp, $chosen_shop_node );
 				}
-
-				break;
 		}
-
+		
 		return $timestamp;
 	}
-
+	
 	// Ontvangt een timestamp en antwoordt met eerste werkdag die er toe doet
 	function get_first_working_day( $from ) {
 		if ( date_i18n( 'N', $from ) < 6 and date_i18n( 'G', $from ) < 12 ) {
@@ -5153,8 +5186,8 @@
 	}
 	
 	function get_oxfam_cheques_skus_array() {
-		// Geldig tot eind 2024 en 2025
-		return array( '19041', '19042', '19043', '19031', '19032', '19033' );
+		// Geldig tot eind 2025, 2026 en 2027
+		return array( '19031', '19032', '19033', '19023', '19024', '19025', '19017', '19018', '19019' );
 	}
 	
 	function get_oxfam_cheques_ids_array() {
@@ -5934,14 +5967,15 @@
 			'oxfam_export_used_vouchers_callback'
 		);
 		
-		add_submenu_page(
-			'woonet-woocommerce',
-			'Voucher Lookup',
-			'Voucher Lookup',
-			'create_sites',
-			'woonet-woocommerce-voucher-lookup',
-			'oxfam_voucher_lookup_callback'
-		);
+		// Nog niet uitgewerkt
+		// add_submenu_page(
+		// 	'woonet-woocommerce',
+		// 	'Voucher Lookup',
+		// 	'Voucher Lookup',
+		// 	'create_sites',
+		// 	'woonet-woocommerce-voucher-lookup',
+		// 	'oxfam_voucher_lookup_callback'
+		// );
 		
 		add_submenu_page(
 			'woonet-woocommerce',
@@ -6175,20 +6209,20 @@
 	add_action( 'wp_ajax_oxfam_stock_action', 'oxfam_stock_action_callback' );
 	add_action( 'wp_ajax_oxfam_bulk_stock_action', 'oxfam_bulk_stock_action_callback' );
 	add_action( 'wp_ajax_oxfam_invitation_action', 'oxfam_invitation_action_callback' );
-
+	
 	function oxfam_stock_action_callback() {
 		echo ob2c_save_local_product_details( $_POST['id'], $_POST['meta'], $_POST['value'] );
 		wp_die();
 	}
-
+	
 	function oxfam_bulk_stock_action_callback() {
 		echo ob2c_change_regular_products_stock_status( $_POST['status'], $_POST['assortment'] );
 		wp_die();
 	}
-
+	
 	function ob2c_save_local_product_details( $product_id, $meta, $value ) {
 		$output = 'ERROR';
-
+		
 		$product = wc_get_product( $product_id );
 		if ( $product ) {
 			if ( $meta === 'stockstatus' ) {
@@ -6203,14 +6237,18 @@
 					}
 					$message = 'Voorraadstatus vertaald en opgeslagen!';
 				} else {
-					$product->set_stock_status( $value );
-					$message = 'Voorraadstatus opgeslagen!';
+					// Als voorraadbeheer niet correct uitgeschakeld werd na publicatie, zal instellen van voorraadstatus stilletjes mislukken
+					// Probeer de status in zo'n geval niet te wijzigen, zodat de gebruiker een error te zien krijgt en de helpdesk kan contacteren
+					if ( ! $product->get_manage_stock() ) {
+						$product->set_stock_status( $value );
+						$message = 'Voorraadstatus opgeslagen!';
+					}
 				}
 			} elseif ( $meta === 'featured' ) {
 				$product->set_featured( $value );
 				$message = 'Uitlichting opgeslagen!';
 			}
-
+			
 			if ( $product->save() ) {
 				$output = $message;
 				// Flush na afloop de W3TC-cache van deze specifieke productpagina?
@@ -6219,17 +6257,17 @@
 				// }
 			}
 		}
-
+		
 		return $output;
 	}
-
+	
 	function ob2c_change_regular_products_stock_status( $status, $assortment ) {
 		if ( ! array_key_exists( $status, wc_get_product_stock_status_options() ) ) {
 			return 'ERROR - INVALID STOCK STATUS PASSED';
 		}
-
+		
 		$output = 'ERROR';
-
+		
 		// Query alle gepubliceerde producten, orden op ompaknummer
 		$args = array(
 			'post_type'			=> 'product',
@@ -6240,25 +6278,25 @@
 			'order'				=> 'ASC',
 		);
 		$products = new WP_Query( $args );
-
+		
 		if ( $products->have_posts() ) {
 			$i = 0;
 			$empties = get_oxfam_empties_skus_array();
-
+			
 			while ( $products->have_posts() ) {
 				$products->the_post();
 				$product = wc_get_product( get_the_ID() );
-
+				
 				// Verhinder dat leeggoed ook bewerkt wordt
 				if ( $product === false or in_array( $product->get_sku(), $empties ) ) {
 					continue;
 				}
-
+				
 				// Logica eventueel reeds toepassen in WP_Query voor performantie?
 				if ( ! ob2c_product_matches_assortment( $product, $assortment ) ) {
 					continue;
 				}
-
+				
 				if ( $product->get_stock_status() !== $status ) {
 					$product->set_stock_status( $status );
 					if ( $product->save() ) {
@@ -6267,12 +6305,12 @@
 				}
 			}
 			wp_reset_postdata();
-
+			
 			$output = $i.' voorraadstatussen bijgewerkt!';
 		} else {
 			$output = 'ERROR - NO PRODUCTS FOUND';
 		}
-
+		
 		return $output;
 	}
 	
@@ -6301,7 +6339,24 @@
 				}
 				break;
 				
-			// Voorlopig niet meer gebruikt
+			case 'augustus':
+				if ( has_term( 'augustus-2021', 'product_tag', $product->get_id() ) ) {
+					return true;
+				}
+				break;
+				
+			case 'april':
+				if ( has_term( 'april-2021', 'product_tag', $product->get_id() ) ) {
+					return true;
+				}
+				break;
+				
+			case 'januari':
+				if ( has_term( 'januari-2021', 'product_tag', $product->get_id() ) ) {
+					return true;
+				}
+				break;
+				
 			case 'oktober':
 				if ( has_term( 'oktober-2020', 'product_tag', $product->get_id() ) ) {
 					return true;
@@ -6324,7 +6379,6 @@
 		
 		return false;
 	}
-	
 	
 	function oxfam_invitation_action_callback() {
 		$new_account_path = get_stylesheet_directory() . '/woocommerce/emails/customer-new-account.php';
@@ -6588,9 +6642,33 @@
 			// Opgelet: nu verbergen we alle promotekstjes voor B2B-klanten, ook indien er een coupon met 'b2b' aangemaakt zou zijn
 			if ( $product->is_on_sale() and $product->get_meta('promo_text') !== '' ) {
 				$promo_text = $product->get_meta('promo_text');
+				if ( $product->get_date_on_sale_to() instanceof WC_DateTime ) {
+					$end_date = 't.e.m. '.$product->get_date_on_sale_to()->date_i18n('l j F Y');
+				} else {
+					$end_date = 'zolang de voorraad strekt';
+				}
 				echo '<p class="promotie">';
-					echo $promo_text.' Geldig t.e.m. '.$product->get_date_on_sale_to()->date_i18n('l j F Y').' in alle Oxfam-Wereldwinkels en in onze webshops. <a class="dashicons dashicons-editor-help tooltip" title="Niet cumuleerbaar met andere acties. Niet van toepassing bij verkoop op factuur."></a>';
+					echo $promo_text.' Geldig '.$end_date.' in alle Oxfam-Wereldwinkels en in onze webshops. <a class="dashicons dashicons-editor-help tooltip" title="Niet cumuleerbaar met andere acties. Niet van toepassing bij verkoop op factuur."></a>';
 				echo '</p>';
+			}
+			
+			// Tag automatisch alle producten die deelnemen aan de koffie-actie (oktober 2026)
+			if ( wp_date('Y-m-d') >= '2026-09-14' and wp_date('Y-m-d') <= '2026-10-31' ) {
+				$mok = wc_get_product( wc_get_product_id_by_sku('29020') );
+				if ( $mok !== false and $mok->get_stock_status() === 'instock' ) {
+					$terms = array( 'bonen', 'gemalen' );
+					foreach ( $terms as $term ) {
+						$coffee_term = get_term_by( 'slug', $term, 'product_cat' );
+						if ( $coffee_term !== false ) {
+							if ( in_array( $coffee_term->term_id, $product->get_category_ids() ) ) {
+								echo '<p class="promotie">';
+									echo 'Gratis kunstige koffiemok per aankoop van 1 kg Oxfam-koffie! Voeg vier pakjes van 250 g of één verpakking van 1 kg toe aan je winkelmandje. De tas t.w.v. '.$mok->get_price_html().' wordt automatisch toegevoegd aan je bestelling. Geldig t.e.m. 31 oktober 2026 in alle Oxfam-Wereldwinkels en in onze webshops. <a class="dashicons dashicons-editor-help tooltip" title="Niet cumuleerbaar met andere acties. Niet van toepassing bij verkoop op factuur."></a>';
+								echo '</p>';
+								break;
+							}
+						}
+					}
+				}
 			}
 		}
 	}
@@ -6802,53 +6880,84 @@
 			}
 			
 			ksort( $products_to_deprecate, SORT_NUMERIC );
-			if ( count( $products_to_deprecate ) > 0 ) {
-				$headers = array();
-				$headers[] = 'From: "Helpdesk E-Commerce" <'.get_site_option('admin_email').'>';
-				$headers[] = 'Content-Type: text/html';
-				$body = '<p>Je taak voor deze maand zit er bijna op. Gelieve wel nog onderstaande producten uit te faseren: niet verwijderen (dat doen we pas als alle lokale voorraden uitgeput zijn en/of de laatst uitgeleverde THT-datum gepaseerd is!) maar wel de voorraad op 0 zetten en nabestellingen blokkeren (indien dit nog niet automatisch gebeurde) én de BestelWeb-dropdown op \'nee\' zetten.</p><ol><li>'.implode( '</li><li>', $products_to_deprecate ).'</li></ol><p>&nbsp;</p><p><i>Dit is een automatisch bericht.</i></p>';
-				wp_mail( array( 'kristof.beausaert@oft.be', 'info@fullstackahead.be' ), 'Hoera, de productimport is afgelopen!', '<html>'.$body.'</html>', $headers );
-				write_log( "Lijst van ".count( $products_to_deprecate )." uit te faseren producten gemaild naar beheerders" );
-			}
 			
+			$headers = array();
+			$headers[] = 'From: "Helpdesk E-Commerce" <'.get_site_option('admin_email').'>';
+			$headers[] = 'Content-Type: text/html';
+			
+			if ( count( $products_to_deprecate ) > 0 ) {
+				$body = '<p>Je taak voor deze maand zit er bijna op.<p><p>Gelieve wel nog onderstaande producten uit te faseren: niet verwijderen (dat doen we pas als alle lokale voorraden uitgeput zijn en/of de laatst uitgeleverde THT-datum gepaseerd is!) maar wel de voorraad op 0 zetten en nabestellingen blokkeren (indien dit nog niet automatisch gebeurde) én de BestelWeb-dropdown op \'nee\' zetten. Zo worden ze onzichtbaar op het hoofdniveau én kleuren ze oranje in het lokale voorraadbeheer.</p><ol><li>'.implode( '</li><li>', $products_to_deprecate ).'</li></ol>';
+			} else {
+				$body = '<p>Je taak voor deze maand zit erop!</p><p>Er zijn geen producten uit te faseren.</p>';
+			}
+			$body .= '<p>&nbsp;</p><p><i>Dit is een automatisch bericht.</i></p>';
+			
+			wp_mail( array( 'kristof.beausaert@oft.be', 'xafiatou.abdoul@oft.be', 'info@fullstackahead.be' ), 'Hoera, de productimport is afgelopen!', '<html>'.$body.'</html>', $headers );
+			write_log( "Lijst van ".count( $products_to_deprecate )." uit te faseren producten gemaild naar beheerders" );
+			
+			// Hernoem de file indien ze geüpload werd naar de server
 			$old = WP_CONTENT_DIR."/erp-import.csv";
-			$new = WP_CONTENT_DIR."/erp-import-".date_i18n('Y-m-d').".csv";
+			$new = WP_CONTENT_DIR."/erp-import-".wp_date('Y-m-d').".csv";
 			rename( $old, $new );
 		}
 	}
 	
 	// Functie die product-ID's van de hoofdsite vertaalt en het metaveld opslaat in de huidige subsite (op basis van artikelnummer)
-	function translate_main_to_local_ids( $local_post_id, $meta_key, $product_ids_to_translate ) {
-		write_log( "Localising IDs ".implode( ', ', $product_ids_to_translate )." in '".$meta_key."' for coupon ID ".$local_post_id." in blog ID ".get_current_blog_id()." ..." );
+	function translate_main_to_local_ids( $local_post_id, $meta_key, $ids_to_translate, $taxonomy = 'product' ) {
+		write_log( "Localising IDs ".implode( ', ', $ids_to_translate )." in '".$meta_key."' for coupon ID ".$local_post_id." in blog ID ".get_current_blog_id()." ..." );
 		
-		if ( is_array( $product_ids_to_translate ) ) {
-			$local_product_ids = array();
+		if ( is_array( $ids_to_translate ) ) {
+			$local_ids = array();
 			
-			foreach ( $product_ids_to_translate as $main_product_id ) {
-				switch_to_blog(1);
-				$main_product = wc_get_product( $main_product_id );
-				restore_current_blog();
-				if ( ! $main_product instanceof WC_Product ) {
-					write_log( "Product with ID ".$main_product_id." not found in main site while localizing ".$meta_key." field for coupon ID ".$local_post_id );
-					continue;
-				}
+			switch ( $taxonomy ) {
+				case 'product':
+					foreach ( $ids_to_translate as $main_product_id ) {
+						switch_to_blog(1);
+						$main_product = wc_get_product( $main_product_id );
+						restore_current_blog();
+						if ( ! $main_product instanceof WC_Product ) {
+							write_log( "Product with ID ".$main_product_id." not found in main site while localizing ".$meta_key." field for coupon ID ".$local_post_id );
+							continue;
+						}
+						
+						$local_product_id = wc_get_product_id_by_sku( $main_product->get_sku() );
+						if ( $local_product_id === 0 ) {
+							write_log( "Product with SKU ".$main_product->get_sku()." not found in blog ID ".get_current_blog_id()." while localizing ".$meta_key." field for coupon ID ".$local_post_id );
+							continue;
+						}
+						
+						$local_ids[] = $local_product_id;
+					}
+					
+					// Array opnieuw serialiseren voor bepaalde keys
+					$coupon_keys = array( 'product_ids', 'exclude_product_ids', '_wjecf_free_product_ids' );
+					if ( in_array( $meta_key, $coupon_keys ) ) {
+						$local_ids = implode( ',', $local_ids );
+					}
+					break;
 				
-				$local_product_id = wc_get_product_id_by_sku( $main_product->get_sku() );
-				if ( $local_product_id === 0 ) {
-					write_log( "Product with SKU ".$main_product->get_sku()." not found in blog ID ".get_current_blog_id()." while localizing ".$meta_key." field for coupon ID ".$local_post_id );
-					continue;
-				}
-				
-				$local_product_ids[] = $local_product_id;
+				case 'product_cat':
+					foreach ( $ids_to_translate as $main_category_id ) {
+						switch_to_blog(1);
+						$main_category = get_term( $main_category_id, $taxonomy );
+						restore_current_blog();
+						if ( ! $main_category instanceof WP_Term ) {
+							write_log( "Category with ID ".$main_category->term_id." not found in main site while localizing ".$meta_key." field for coupon ID ".$local_post_id );
+							continue;
+						}
+						
+						$local_category = get_term_by( 'slug', $main_category->slug, $taxonomy );
+						if ( ! $local_category instanceof WP_Term ) {
+							write_log( "Category '".$main_category->slug."' not found in blog ID ".get_current_blog_id()." while localizing ".$meta_key." field for coupon ID ".$local_post_id );
+							continue;
+						}
+						
+						$local_ids[] = $local_category->term_id;
+					}
+					break;
 			}
 			
-			// Niet serialiseren voor coupons
-			$coupon_keys = array( 'product_ids', 'exclude_product_ids', '_wjecf_free_product_ids' );
-			if ( in_array( $meta_key, $coupon_keys ) ) {
-				$local_product_ids = implode( ',', $local_product_ids );
-			}
-			
-			update_post_meta( $local_post_id, $meta_key, $local_product_ids );
+			update_post_meta( $local_post_id, $meta_key, $local_ids );
 		} else {
 			// Zorg ervoor dat het veld ook bij de child geleegd wordt!
 			update_post_meta( $local_post_id, $meta_key, NULL );
@@ -6904,7 +7013,95 @@
 		
 		return implode( ',', $slave_product_ids );
 	}
-
+	
+	
+	
+	################
+	# COMMUNICATIE #
+	################
+	
+	// Voeg een custom dashboard widget toe met nieuws over het pilootproject
+	add_action( 'wp_dashboard_setup', 'add_pilot_widget' );
+	
+	function add_pilot_widget() {
+		global $wp_meta_boxes;
+		
+		wp_add_dashboard_widget(
+			'dashboard_pilot_news_widget',
+			'Info voor webshopmedewerkers',
+			'dashboard_pilot_news_widget_function'
+		);
+		
+		$dashboard = $wp_meta_boxes['dashboard']['normal']['core'];
+		
+		$my_widget = array( 'dashboard_pilot_news_widget' => $dashboard['dashboard_pilot_news_widget'] );
+		unset( $dashboard['dashboard_pilot_news_widget'] );
+		
+		$sorted_dashboard = array_merge( $my_widget, $dashboard );
+		$wp_meta_boxes['dashboard']['normal']['core'] = $sorted_dashboard;
+	}
+	
+	// Stel de inhoud van de widget op
+	function dashboard_pilot_news_widget_function() {
+		echo '<div class="rss-widget">';
+		echo '<p>De <a href="https://github.com/OxfamBelgium/ob2c/wiki" target="_blank">online FAQ voor webshopbeheerders</a> staat online. Hierin verzamelen we alle mogelijke vragen die jullie als lokale webshopbeheerders kunnen hebben en beantwoorden we ze punt per punt met tekst en screenshots. Gebruik eventueel de zoekfunctie bovenaan rechts.</p>';
+		echo '<p>Daarnaast kun je de nieuwe slides van de voorbije opleidingssessies raadplegen voor een overzicht van alle afspraken en praktische details: <a href="https://shop.oxfamwereldwinkels.be/wp-content/uploads/slides-opleiding-B2C-webshop-concept.pdf" download>Deel 1: Concept</a> (16/05/2020) en <a href="https://shop.oxfamwereldwinkels.be/wp-content/uploads/slides-opleiding-B2C-webshop-praktisch.pdf" download>Deel 2: Praktisch</a> (30/05/2020). Op <a href="https://copain.oww.be/webshop" target="_blank">de webshoppagina op Copain</a> vind je een overzicht van de belangrijkste documenten.</p>';
+		echo '<p>Stuur een mailtje naar de <a href="mailto:webshop@oft.be">Helpdesk E-Commerce</a> als er toch nog iets onduidelijk is, of als je een suggestie hebt.</p>';
+		echo '</div>';
+	}
+	
+	// Verberg berichten van plugins bovenaan adminpagina's
+	add_action( 'admin_head', 'hide_non_oxfam_notices', 10000 );
+	
+	function hide_non_oxfam_notices() {
+		// Aanpassingen voor iPhone 10+
+		echo '<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">';
+		
+		// Gelijkaardige 'Show plugins/themes notices to admin only'-optie van User Role Editor niet inschakelen!
+		if ( ! current_user_can('create_sites') ) {
+			remove_all_actions('admin_notices');
+			
+			// Melding tonen bovenaan scherm indien bulkwijziging op orders geblokkeerd werd
+			add_action( 'admin_notices', 'oxfam_admin_notices_orders' );
+		}
+	}
+	
+	function oxfam_admin_notices_orders() {
+		global $pagenow, $post_type;
+		
+		if ( 'edit.php' === $pagenow and 'shop_order' === $post_type ) {
+			if ( isset( $_REQUEST['bulk_action'] ) ) {
+				if ( $_REQUEST['bulk_action'] === 'marked_completed' ) {
+					$number = isset( $_REQUEST['changed'] ) ? absint( $_REQUEST['changed'] ) : 0;
+					$message = sprintf( _n( '%d bestelstatus proberen te wijzigen.', '%d bestelstatussen proberen te wijzigen.', $number, 'woocommerce' ), number_format_i18n( $number ) );
+					echo '<div class="updated"><p>' . esc_html( $message ) . ' Ongeldige wijzigingen kunnen tegengehouden zijn door het systeem! Raadpleeg de logs in de rechterkolom van het orderdetail als je merkt dat de status onveranderd gebleven is.</p></div>';
+				}
+			}
+		}
+	}
+	
+	// Schakel onnuttige widgets uit voor iedereen
+	add_action( 'admin_init', 'remove_dashboard_meta' );
+	
+	function remove_dashboard_meta() {
+		remove_meta_box( 'dashboard_right_now', 'dashboard', 'normal' );
+		remove_meta_box( 'dashboard_activity', 'dashboard', 'normal' );
+		remove_meta_box( 'woocommerce_dashboard_recent_reviews', 'dashboard', 'normal' );
+		remove_meta_box( 'dashboard_quick_press', 'dashboard', 'side' );
+		remove_meta_box( 'dashboard_primary', 'dashboard', 'side' );
+		remove_meta_box( 'wpb_visual_composer', 'vc_grid_item', 'side' );
+		remove_meta_box( 'wpb_visual_composer', 'vc_grid_item-network', 'side' );
+		
+		if ( ! current_user_can('create_sites') ) {
+			remove_meta_box( 'dashboard_primary', 'dashboard-network', 'normal' );
+			remove_meta_box( 'network_dashboard_right_now', 'dashboard-network', 'normal' );
+			// Want lukt niet via URE Pro
+			remove_meta_box( 'postcustom', 'shop_order', 'normal' );
+		}
+		
+		remove_action( 'welcome_panel', 'wp_welcome_panel' );
+	}
+	
 	// Ondersteuning voor extra parameters toevoegen aan wc_get_orders()
 	add_filter( 'woocommerce_order_data_store_cpt_get_orders_query', 'wc_get_orders_handle_custom_query_var', 10, 2 );
 
@@ -7388,15 +7585,16 @@
 					$stores = new WP_Query( $store_args );
 					
 					if ( count( $stores->posts ) > 0 ) {
-						// Er kunnen meerdere winkels zijn met dezelfde blog-ID, hoe selecteren we de hoofdwinkel?
-						// Voorlopig nemen we gewoon de eerste uit de lijst resultaten
 						if ( $return_all_shops ) {
 							if ( ! array_key_exists( $zip, $global_zips ) ) {
 								$global_zips[ $zip ] = array();
 							}
-							$global_zips[ $zip ][] = reset( $stores->posts );
+							
+							// Er kunnen meerdere winkels zijn met dezelfde blog-ID, selecteer de hoofdwinkel
+							$global_zips[ $zip ][] = get_main_shop_from_store_list( $stores->posts, $zip );
 						} else {
-							$global_zips[ $zip ] = reset( $stores->posts );
+							// Er kunnen meerdere winkels zijn met dezelfde blog-ID, selecteer de hoofdwinkel
+							$global_zips[ $zip ] = get_main_shop_from_store_list( $stores->posts, $zip );
 						}
 					}
 					
@@ -7418,4 +7616,23 @@
 		
 		ksort( $global_zips );
 		return $global_zips;
+	}
+	
+	function get_main_shop_from_store_list( $store_ids, $zip ) {
+		if ( false === ( $main_shop = get_transient( 'oxfam_main_shop_for_zip_'.$zip ) ) ) {
+			// Als fallback nemen we gewoon de eerste uit de lijst
+			$main_shop = reset( $store_ids );
+			
+			// Check of er handmatig 'Hoofdwinkel' toegevoegd werd aan een Store Locator entry
+			foreach ( $store_ids as $store_id ) {
+				if ( strpos( get_the_content( NULL, false, $store_id ), 'Hoofdwinkel' ) !== false ) {
+					$main_shop = $store_id;
+					break;
+				}
+			}
+			
+			set_transient( 'oxfam_main_shop_for_zip_'.$zip, $main_shop, WEEK_IN_SECONDS );
+		}
+		
+		return $main_shop;
 	}

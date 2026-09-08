@@ -26,18 +26,17 @@ if ( ! defined( 'ABSPATH' ) ) {
 				<?php
 					$products_tags = array();
 					
-					$args = array(
-						'stock_status' => 'instock',
-						'include' => wc_get_product_ids_on_sale(),
-					);
-					$sale_products = wc_get_products( $args );
-					if ( count( $sale_products ) > 0 ) {
-						$products_tags[] = 'promotie';
-					}
+					// $args = array(
+					// 	'stock_status' => 'instock',
+					// 	'include' => wc_get_product_ids_on_sale(),
+					// );
+					// $sale_products = wc_get_products( $args );
+					// if ( count( $sale_products ) > 0 ) {
+					// 	$products_tags[] = 'promotie';
+					// }
 					
 					// $products_tags[] = 'pasen';
-					// $products_tags[] = 'sinterklaas';
-					// $products_tags[] = 'faire-feesten';
+					$products_tags[] = 'sinterklaas';
 					
 					foreach ( $products_tags as $product_slug ) {
 						$term = get_term_by( 'slug', $product_slug, 'product_tag' );

@@ -53,20 +53,20 @@
 			$distribution = array();
 			
 			if ( $credit_refs === false ) {
-				// Gelijkaardige array komt ook voor in get-local-report.php, beter opslaan in optie?
+				// Gelijkaardige array komt ook voor get-local-report.php, beter opslaan in optie?
 				$credit_refs = array(
 					// Terugbetalingsreferenties definitief afgesloten voor creditering
 					// '08917' => array( 'issuer' => 'Cera', 'value' => 30, 'expires' => '2023-01-01' ),
 					// '08924' => array( 'issuer' => 'CM', 'value' => 10, 'expires' => '2023-01-01' ),
-					// '08935' => array( 'issuer' => 'Gezinsbond', 'value' => 50, 'expires' => '2024-01-01' ),
-					// '08936' => array( 'issuer' => 'Gezinsbond', 'value' => 25, 'expires' => '2024-01-01' ),
 					// '08937' => array( 'issuer' => 'Cera', 'value' => 30, 'expires' => '2024-03-01' ),
 					// '08953' => array( 'issuer' => 'Gezinsbond', 'value' => 50, 'expires' => '2025-01-01' ),
 					// '08954' => array( 'issuer' => 'Gezinsbond', 'value' => 25, 'expires' => '2025-01-01' ),
-					'08955' => array( 'issuer' => 'Cera', 'value' => 30, 'expires' => '2025-03-01' ),
+					// '08955' => array( 'issuer' => 'Cera', 'value' => 30, 'expires' => '2025-03-01' ),
 					'08899' => array( 'issuer' => 'Gezinsbond', 'value' => 50, 'expires' => '2026-01-01' ),
 					'08900' => array( 'issuer' => 'Gezinsbond', 'value' => 25, 'expires' => '2026-01-01' ),
-					// Nieuwe acties hier aanvullen met de parameters issuer / value / expires, zoals in de MySQL-tabel
+					'08935' => array( 'issuer' => 'Gezinsbond', 'value' => 50, 'expires' => '2027-01-01' ),
+					'08936' => array( 'issuer' => 'Gezinsbond', 'value' => 25, 'expires' => '2027-01-01' ),
+					// Nieuwe acties hier aanvullen met de parameters issuer / value / expires, zoals ze aangemaakt zijn in de MySQL-tabel
 					// Op die manier kunnen de bonnen in het rapport aan de juiste crediteringscode gelinkt worden
 					// Odisy-artikelnummer te ontvangen van Aike Detelder
 				);
@@ -236,9 +236,10 @@
 					$spreadsheet->setActiveSheetIndexByName( $credit_ref );
 				} catch (Exception $e) {
 					// Maak het werkblad aan indien de referentie nog niet bestaat in de template
-					write_log("Excel-werkblad bestaat nog niet, probeer het aan te maken ...");
-					// @toCheck: Werkt niet goed, nog steeds fatale error ...
+					write_log("Excel-werkblad '".$credit_ref."' niet gevonden, probeer aan te maken ...");
 					$empty_sheet->setTitle( $credit_ref );
+					// @toCheck: Fatale error omdat we werkblad iedere keer opnieuw proberen toevoegen?
+					// Workbook already contains a worksheet named 'X'. Rename this worksheet first.
 					$spreadsheet->addSheet( $empty_sheet );
 					$spreadsheet->setActiveSheetIndexByName( $credit_ref );
 				}

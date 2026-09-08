@@ -44,14 +44,14 @@ $tooltip    = sprintf(
 
 // Decide what is the prettiest amount of columns to display
 // Defaults to 4, 3 on large screen, 2 on small screen. Use less columns if possible without adding an extra row on screen.
-// GEWIJZIGD: Toon producten altijd in 4 kolommen
-$n = 4;
+// GEWIJZIGD: Toon producten altijd in 3 kolommen
+$n = 3;
 $class = 'wjecf-cols cols-' . ceil( $n / ceil( $n / 4 ) ) . ' cols-lg-' . ceil( $n / ceil( $n / 3 ) ) . ' cols-sm-' . ceil( $n / ceil( $n / 2 ) );
 
 ?>
 <div id="wjecf-select-free-products" class="wjecf-select-free-products coupon-<?php echo esc_attr( sanitize_title( $coupon_code ) ); ?>">
-	<!-- GEWIJZIGD: H4 i.p.v. H3 -->
-	<h4><?= WJECF_API()->get_select_free_product_message( $coupon ); ?></h4>
+	<!-- GEWIJZIGD: H4 i.p.v. H3 en maximum aantal gratis producten vermelden -->
+	<h4><?= WJECF_API()->get_select_free_product_message( $coupon ); ?> (max. <?= $max_quantity; ?> repen):</h4>
 	<input type="hidden" name="<?php echo $name_prefix; ?>[coupon]" value="<?php echo esc_attr( $coupon_code ); ?>" />
 	<input type="hidden" id="<?php echo $totalizer_id; ?>" data-wjecf-qty-max="<?php echo $max_quantity; ?>" />
 	<ul class="<?php echo esc_attr( $class ); ?>">
@@ -63,21 +63,20 @@ $class = 'wjecf-cols cols-' . ceil( $n / ceil( $n / 4 ) ) . ' cols-lg-' . ceil( 
 		?>
 			<li data-wjecf-free-product-group="<?php echo $form_item->field_id; ?>">
 				<?php
-					//Input
+					// GEWIJZIGD: Toon packshot en productnaam vòòr input
+					echo $product->get_image() . '<br/>';
+					echo '<label for="' . $form_item->field_id . '">' . esc_html( $product->get_name(), 'woocommerce' ) . '</label>';
+					$template->render_form_item_variations( $form_item );
+					
 					$template->render_form_item_input(
 						$form_item, array(
 							'type'  => $input_type,
-							'title' => $tooltip,
+							// GEWIJZIGD: Schakel tooltip uit
+							// 'title' => $tooltip,
 							// GEWIJZIGD: Voeg een klasse toe zodat we via JavaScript een cart refresh kunnen triggeren
 							'class' => 'trigger-cart-refresh',
 						)
 					);
-					//Label with title and product image inside of it
-					echo ' <label for="' . $form_item->field_id . '">' . esc_html( $product->get_name(), 'woocommerce' ) . '<br>';
-					echo $product->get_image();
-					echo '</label>';
-					//Variable product attributes
-					$template->render_form_item_variations( $form_item );
 				?>
 			</li>
 		<?php

@@ -1,15 +1,33 @@
 <?php
 	global $product;
 	$labels = array();
-
+	
+	// Tag automatisch alle producten die deelnemen aan de koffie-actie (oktober 2026)
+	// Het product hoeft dus niet in promo te staan!
+	if ( ! is_b2b_customer() and wp_date('Y-m-d') >= '2026-09-14' and wp_date('Y-m-d') <= '2026-10-31' ) {
+		$mok = wc_get_product( wc_get_product_id_by_sku('29020') );
+		if ( $mok !== false and $mok->get_stock_status() === 'instock' ) {
+			$terms = array( 'bonen', 'gemalen' );
+			foreach ( $terms as $term ) {
+				$coffee_term = get_term_by( 'slug', $term, 'product_cat' );
+				if ( $coffee_term !== false ) {
+					if ( in_array( $coffee_term->term_id, $product->get_category_ids() ) ) {
+						$labels['promotion'] = 'Kopjesactie';
+						break;
+					}
+				}
+			}
+		}
+	}
+	
 	if ( ! is_b2b_customer() and $product->is_on_sale() ) {
 		// Neem algemeen label als default
 		$labels['promotion'] = 'Promo';
-
+		
 		// Zoek vervolgens de details van de actie op
 		// Handmatig beheerde lijst, want simpeler dan afleiden uit de kortingsregels!
-
-		$wijnfestival_products = array();
+		
+		$wijnfestival_products = array( 20211, 20225, 20262, 20067, 20068, 20074, 20413, 20415 );
 		if ( in_array( $product->get_sku(), $wijnfestival_products ) ) {
 			$labels['promotion'] = '-15% per 2 flessen';
 		}
@@ -34,12 +52,12 @@
 			$labels['promotion'] = 'Promo 3+2 gratis';
 		}
 		
-		$twenty_percent_off_products = array( 11126, 18596, 19760, 28712, 28728, 29925, 35393, 35394, 35395, 36280, 36379, 64875, 64876, 65200, 65202, 65204, 65205, 65270, 65273, 65274, 95325 );
-		if ( in_array( $product->get_sku(), $twenty_percent_off_products ) ) {
-			$labels['promotion'] = 'Promo -20%';
+		$ten_percent_off_products = array( 22023, 22024, 26400, 26401 );
+		if ( in_array( $product->get_sku(), $ten_percent_off_products ) ) {
+			$labels['promotion'] = 'Promo -10%';
 		}
 		
-		$twentyfive_percent_off_products = array( 24553 );
+		$twentyfive_percent_off_products = array();
 		if ( in_array( $product->get_sku(), $twentyfive_percent_off_products ) ) {
 			$labels['promotion'] = 'Promo -25%';
 		}
@@ -69,21 +87,21 @@
 			$labels['promotion'] = 'Promo 5+1 gratis';
 		}
 	}
-
+	
 	if ( $product->get_date_created() !== NULL and $product->get_date_created()->date_i18n('Y-m-d') > date_i18n( 'Y-m-d', strtotime('-3 months') ) ) {
 		$labels['newbee'] = 'Nieuw';
 	}
-
+	
 	if ( stripos( $product->get_attribute('preferences'), 'biologisch' ) !== false ) {
 		$labels['organic'] = 'Bioproduct';
 	}
-
+	
 	if ( ! is_main_site() and ! does_risky_delivery() ) {
 		if ( $product->get_shipping_class() === 'breekbaar' ) {
 			$labels['pickup-only'] = 'Afhaling';
 		}
 	}
-
+	
 	if ( count( $labels ) > 0 ) {
 		echo '<ul class="info-labels">';
 		foreach ( $labels as $class => $label ) {
@@ -91,5 +109,3 @@
 		}
 		echo '</ul>';
 	}
-
-/* Omit closing PHP tag at the end of PHP files to avoid "headers already sent" issues. */

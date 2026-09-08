@@ -45,12 +45,9 @@
 				
 				// Tellers op 0 zetten
 				$credit_refs = array(
-					// Bonnen voor 2024-2025
-					'08953' => array( 'issuer' => 'Gezinsbond', 'value' => 50, 'count' => 0 ),
-					'08954' => array( 'issuer' => 'Gezinsbond', 'value' => 25, 'count' => 0 ),
-					'08955' => array( 'issuer' => 'Cera', 'value' => 30, 'count' => 0 ),
-					'08899' => array( 'issuer' => 'Gezinsbond', 'value' => 50, 'count' => 0 ),
-					'08900' => array( 'issuer' => 'Gezinsbond', 'value' => 25, 'count' => 0 ),
+					// Bonnen voor 2026
+					'08935' => array( 'issuer' => 'Gezinsbond', 'value' => 50, 'count' => 0 ),
+					'08936' => array( 'issuer' => 'Gezinsbond', 'value' => 25, 'count' => 0 ),
 				);
 				
 				if ( $credit_date === '0000-00-00' ) {

@@ -2,22 +2,11 @@
 	
 	if ( ! defined('ABSPATH') ) exit;
 	
-	function get_external_wpsl_store( $shop_node, $shop_post_id = false ) {
+	function get_external_wpsl_store( $shop_node ) {
 		$store_data = false;
-		
-		if ( $shop_post_id ) {
-			$uri = 'www.oxfamwereldwinkels.be/wp-json/wp/v2/wpsl_stores';
-			$shop_id = intval( $shop_post_id );
-			$context = array( 'source' => 'WordPress API' );
-		} else {
-			if ( wp_get_environment_type() === 'production' ) {
-				$uri = 'oxfambelgie.be/api/v1/stores';
-			} else {
-				$uri = 'stage.oxfambelgie.be/api/v1/stores';
-			}
-			$shop_id = intval( $shop_node );
-			$context = array( 'source' => 'Drupal API' );
-		}
+		$uri = 'oxfambelgie.be/api/v1/stores';
+		$shop_id = intval( $shop_node );
+		$context = array( 'source' => 'Drupal API' );
 		
 		if ( $shop_id > 0 ) {
 			if ( false === ( $store_data = get_site_transient( $shop_id.'_store_data' ) ) ) {

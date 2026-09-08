@@ -283,7 +283,7 @@
 		}
 	}
 	
-	function ob2c_bulk_create_digital_vouchers( $issuer = 'Cera', $expires = '2024-03-01', $value = 30, $number = 1000 ) {
+	function ob2c_bulk_create_digital_vouchers( $issuer = 'Cera', $expires = '2027-01-01', $value = 30, $number = 1000 ) {
 		global $wpdb;
 		$created_codes = array();
 		

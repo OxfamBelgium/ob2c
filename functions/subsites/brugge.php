@@ -29,7 +29,7 @@
 		$location = 'Brugge';
 		$shop_codes = array( 'Brugge' => 'C1', 'Knokke' => 'C2', 'Gistel' => 'C4' );
 		
-		// Winkelcode variëren volgens afhaalpunt 
+		// Winkelcode variëren volgens afhaalpunt
 		if ( $wc_order->has_shipping_method('local_pickup_plus') ) {
 			$shipping_methods = $wc_order->get_shipping_methods();
 			$shipping_method = reset( $shipping_methods );
@@ -204,7 +204,7 @@
 			}
 			
 			if ( @fwrite( $stream, $data_to_send ) === false ) {
-				throw new Exception( "Could not send data from file: ".$local_file );	
+				throw new Exception( "Could not send data from file: ".$local_file );
 			}
 			@fclose($stream);
 			

@@ -102,9 +102,6 @@
 					$content .= '">';
 						$content .= '<div class="cell" style="padding: 0.25em; width: 3%; text-align: center;"><a href="'.get_permalink().'" target="_blank">'.$product->get_image( 'wc_order_status_icon', null, false ).'</a></div>';
 						$content .= '<div class="cell '.$class.'" style="width: 40%; text-align: left;"><span class="title">'.$product->get_sku().': '.$product->get_title().' ('.$product->get_meta('_shopplus_code').')';
-						if ( has_term( 'Grootverbruik', 'product_cat', get_the_ID() ) ) {
-							$content .= ' <small>ENKEL ZICHTBAAR VOOR B2B-KLANTEN</small>';
-						}
 						$content .= '</span></div>';
 						$content .= '<div class="cell"><select class="toggle" id="'.get_the_ID().'-stockstatus">';
 							$content .= '<option value="instock" '.selected( $product->get_stock_status(), 'instock', false ).'>'.$stock_statuses['instock'].'</option>';
@@ -114,6 +111,13 @@
 						$content .= '<div class="cell">';
 						if ( $product->get_catalog_visibility() !== 'hidden' and ! has_term( 'Grootverbruik', 'product_cat', get_the_ID() ) ) {
 							$content .= '<input class="toggle" type="checkbox" id="'.get_the_ID().'-featured" '.checked( $product->is_featured(), true, false ).'> <label for="'.get_the_ID().'-featured">In de kijker?</label>';
+						} else {
+							if ( $product->get_catalog_visibility() === 'hidden' ) {
+								$content .= '<small>NIET ZICHTBAAR VOOR KLANTEN</small>';
+							}
+							if ( has_term( 'Grootverbruik', 'product_cat', get_the_ID() ) ) {
+								$content .= '<small>ENKEL ZICHTBAAR VOOR B2B-KLANTEN</small>';
+							}
 						}
 						$content .= '</div>';
 					$content .= '<div class="cell output"></div>';

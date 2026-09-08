@@ -99,7 +99,8 @@
 							'include' => wc_get_product_ids_on_sale(),
 							// Is blanco na de start van de promoperiode ...
 							// 'date_on_sale_from' => '<='.date_i18n('Y-m-d'),
-							'date_on_sale_to' => '>='.date_i18n('Y-m-d'),
+							// Is leeg bij de Campesino-actie zonder einddatum ...
+							// 'date_on_sale_to' => '>='.date_i18n('Y-m-d'),
 						);
 						$sale_products = wc_get_products( $args );
 						

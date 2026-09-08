@@ -11,7 +11,7 @@
 		'post_status' => 'future',
 		// Alternatieve methode (bv. als de bon inmiddels al op publish staat)
 		// 'Opgelet: 'post_name__in' kijkt naar de (onzichtbare) originele slug, dit kan afwijken van de (zichtbare) titel indien achteraf gewijzigd!
-		// 'post_name__in' => array( '20240708-blikjes' ),
+		// 'post_name__in' => array( '202509-chips' ),
 		'posts_per_page' => -1,
 	);
 	$all_coupons = new WP_Query( $args );
@@ -20,21 +20,23 @@
 	if ( $all_coupons->have_posts() and ! is_main_site() ) {
 		while ( $all_coupons->have_posts() ) {
 			$all_coupons->the_post();
-			$ids = get_post_meta( get_the_ID(), 'product_ids', true );
-			if ( $ids !== '' ) {
-				$global_ids = explode( ',', $ids );
-				translate_main_to_local_ids( get_the_ID(), 'product_ids', $global_ids );
+			$keys_to_localize = array( 'product_ids', 'exclude_product_ids', '_wjecf_free_product_ids', 'product_categories', 'exclude_product_categories' );
+			
+			foreach ( $keys_to_localize as $key ) {
+				$global_value = get_post_meta( get_the_ID(), $key, true );
+				
+				if ( str_contains( $key, '_categories' ) ) {
+					if ( is_array( $global_value ) ) {
+						translate_main_to_local_ids( get_the_ID(), $key, $global_value, 'product_cat' );
+					}
+				} else {
+					if ( $global_value !== '' ) {
+						$global_ids = explode( ',', $global_value );
+						translate_main_to_local_ids( get_the_ID(), $key, $global_ids );
+					}
+				}
 			}
-			$exclude_ids = get_post_meta( get_the_ID(), 'exclude_product_ids', true );
-			if ( $exclude_ids !== '' ) {
-				$exclude_global_ids = explode( ',', $exclude_ids );
-				translate_main_to_local_ids( get_the_ID(), 'exclude_product_ids', $exclude_global_ids );
-			}
-			$free_product_ids = get_post_meta( get_the_ID(), '_wjecf_free_product_ids', true );
-			if ( $free_product_ids !== '' ) {
-				$free_product_global_ids = explode( ',', $free_product_ids );
-				translate_main_to_local_ids( get_the_ID(), '_wjecf_free_product_ids', $free_product_global_ids );
-			}
+			
 			write_log( get_bloginfo('name').": made coupon '".get_the_title()."' local" );
 		}
 		wp_reset_postdata();
@@ -44,7 +46,6 @@
 	
 	// Alle nieuwe artikels lokaal uit voorraad zetten
 	$new_skus = get_site_option( 'oxfam_shop_dashboard_notice_new_products', array() );
-	
 	if ( count( $new_skus ) > 0 and ! is_main_site() ) {
 		foreach ( $new_skus as $sku ) {
 			$product_id = wc_get_product_id_by_sku( $sku );
@@ -63,7 +64,7 @@
 	
 	
 	// Voorraad overzetten van oud naar nieuw ompaknummer (enkel indien consumenteneenheid identiek gebleven is!)
-	// Na afloop plaats je het oude ompaknummer in concept (voor latere definitieve verwijdering)
+	// Na afloop plaats je het oude ompaknummer in de prullenbak (voor latere definitieve verwijdering)
 	$replaced_skus = get_site_option( 'oxfam_shop_dashboard_notice_replaced_products', array() );
 	foreach ( $replaced_skus as $old_new ) {
 		$parts = explode( '-', $old_new );
@@ -80,6 +81,8 @@
 			if ( $old_product_id ) {
 				$old_product = wc_get_product( $old_product_id );
 				$product->set_manage_stock('no');
+				// Ook publicatiedatum kopiëren zodat het product niet als 'nieuw' verschijnt?
+				// $product->set_date_created( $old_product->get_date_created()->__toString() );
 				$product->set_stock_status( $old_product->get_stock_status() );
 				$product->save();
 				write_log( get_bloginfo('name').": stock status '".$old_product->get_stock_status()."' of old SKU ".$old_sku." copied to new SKU ".$new_sku );
@@ -121,7 +124,7 @@
 		// 'status' => 'wc-cancelled',
 		// Alle shop_order_refund's op het order worden automatisch mee verwijderd!
 		'type' => 'shop_order',
-		'date_created' => '<2022-01-01',
+		'date_created' => '<2023-01-01',
 		// Als we in blokken van 3 à 4 maanden wissen, moet het lukken om alle orders in alle webshops in één keer te wissen (zonder time-out)
 		'limit' => -1,
 		// Begin met de oudste orders
@@ -180,7 +183,7 @@
 				// Pas bijgehouden na installatie van WordFence op 21/12/2020
 				// Alle bestaande klanten kregen timestamp '1608508800' tijdens migratie
 				// 'key' => 'wfls-last-login',
-				'value' => strtotime('2022-01-01'),
+				'value' => strtotime('2023-01-01'),
 				'compare' => '<=',
 			),
 		),
@@ -209,18 +212,17 @@
 		foreach ( $member_sites as $site_id => $site ) {
 			switch_to_blog( $site_id );
 			$roles = get_userdata( $user->ID )->roles;
-			write_log( implode( ', ', $roles ) );
-			if ( in_array( 'customer', $roles ) ) {
+			if ( count( array_intersect( array( 'administrator', 'shop_manager', 'local_manager', 'local_helper' ), $roles ) ) > 0 ) {
+				// User is geen gewone klant, account niet wissen
+				write_log( "Account tied to ".$user->user_email." is no ordinary customer in ".$site->path );
+				$user_to_delete = false;
+			} else {
 				$customer_orders = wc_get_orders( array( 'customer_id' => $user->ID, 'limit' => -1 ) );
 				if ( count( $customer_orders ) > 0 ) {
 					// Er zijn nog orders in een andere webshop gelinkt aan de user, account niet wissen
 					write_log( "Account tied to ".$user->user_email." has orders left in ".$site->path );
 					$user_to_delete = false;
 				}
-			} else {
-				// User is geen gewone klant, account niet wissen
-				write_log( "Account tied to ".$user->user_email." is no ordinary customer in ".$site->path );
-				$user_to_delete = false;
 			}
 			restore_current_blog();
 		}
@@ -230,6 +232,7 @@
 			write_log( "Account tied to ".$user->user_email." has no orders left and is not a manager, schedule delete ..." );
 			if ( wpmu_delete_user( $user->ID ) ) {
 				write_log( "User deleted from the entire network!" );
+				update_site_option( 'number_of_users_deleted', get_site_option( 'number_of_users_deleted', 0 ) + 1 );
 			}
 		}
 	}
@@ -340,11 +343,11 @@
 	
 	
 
-	// Verwijder overtollige productcategorieën
+	// Verwijder overtollige productcategorieën (gaat niet automatisch bij syncen taxonomie via Broadcast)
 	// Import maakt onbestaande categorieën automatisch aan, als er iets misliep in de mapping moet je dus wat opkuis doen
 	$taxonomy = 'product_cat';
 	if ( taxonomy_exists( $taxonomy ) ) {
-		$terms = array( 'winkelmateriaal', 'koffiezetsystemen' );
+		$terms = array( 'winkelmateriaal', 'koppen-glazen-bekers' );
 		foreach ( $terms as $term ) {
 			$term_to_delete = get_term_by( 'slug', $term, $taxonomy );
 			if ( $term_to_delete !== false ) {
@@ -375,6 +378,46 @@
 				}
 			} else {
 				write_log( get_bloginfo('name').": partner '".$term."' not found" );
+			}
+		}
+	}
+	
+	
+	
+	// Verwijder uitgefaseerde landen
+	$taxonomy = 'pa_countries';
+	if ( taxonomy_exists( $taxonomy ) ) {
+		$terms = array( 'indonesia' );
+		foreach ( $terms as $term ) {
+			$term_to_delete = get_term_by( 'slug', $term, $taxonomy );
+			if ( $term_to_delete !== false ) {
+				if ( wp_delete_term( $term_to_delete->term_id, $taxonomy ) ) {
+					write_log( get_bloginfo('name').": deleted '".$term_to_delete->name."' country" );
+				} else {
+					write_log( get_bloginfo('name').": could not delete '".$term_to_delete->name."' country" );
+				}
+			} else {
+				write_log( get_bloginfo('name').": country '".$term."' not found" );
+			}
+		}
+	}
+	
+	
+	
+	// Verwijder uitgefaseerde merken
+	$taxonomy = 'pa_merk';
+	if ( taxonomy_exists( $taxonomy ) ) {
+		$terms = array( 'ananas-en-limoen-ideaal-bij-vis-amp-zeevruchten', 'caprimo', 'bioviva', 'baya', 'eza', 'jura', 'marcels-green-soap', 'londji', 'traidcraft', 'van-houten' );
+		foreach ( $terms as $term ) {
+			$term_to_delete = get_term_by( 'slug', $term, $taxonomy );
+			if ( $term_to_delete !== false ) {
+				if ( wp_delete_term( $term_to_delete->term_id, $taxonomy ) ) {
+					write_log( get_bloginfo('name').": deleted '".$term_to_delete->name."' brand" );
+				} else {
+					write_log( get_bloginfo('name').": could not delete '".$term_to_delete->name."' brand" );
+				}
+			} else {
+				write_log( get_bloginfo('name').": brand '".$term."' not found" );
 			}
 		}
 	}
@@ -500,18 +543,33 @@
 	
 	
 	// Stel de openingsuren in van een niet-OWW-afhaalpunt
-	$node = 'stoasje';
+	$node = 'atelier';
 	$hours = array(
-		1 => false,
-		2 => false,
-		3 => false,
-		4 => array(
+		1 => array(
 			array(
-				'start' => '14:30',
-				'end' => '19:00'
+				'start' => '10:00',
+				'end' => '12:00'
 			),
 		),
-		5 => false,
+		2 => false,
+		3 => array(
+			array(
+				'start' => '14:00',
+				'end' => '16:00'
+			),
+		),
+		4 => array(
+			array(
+				'start' => '14:00',
+				'end' => '16:00'
+			),
+		),
+		5 => array(
+			array(
+				'start' => '14:00',
+				'end' => '16:00'
+			),
+		),
 		6 => false,
 		7 => false,
 	);

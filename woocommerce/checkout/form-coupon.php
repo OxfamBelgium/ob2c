@@ -14,7 +14,7 @@ if ( ! wc_coupons_enabled() ) { // @codingStandardsIgnoreLine.
 }
 
 // GEWIJZIGD: Pas tekst aan
-$info_message = apply_filters( 'woocommerce_checkout_coupon_message', esc_html__( 'Kortingsbon of digitale cadeaubon gekregen?', 'oxfam-webshop' ) . ' <a href="#" class="showcoupon">' . __( 'Klik hier om je code in te vullen', 'oxfam-webshop' ) . '</a>' );  
+$info_message = apply_filters( 'woocommerce_checkout_coupon_message', esc_html__( 'Digitale cadeaubon gekregen?', 'oxfam-webshop' ) . ' <a href="#" class="showcoupon">' . __( 'Klik hier om je code in te vullen', 'oxfam-webshop' ) . '</a>' );
 
 global $nm_globals;
 $nm_globals['checkout_coupon_message'] = $info_message;
@@ -25,14 +25,14 @@ $nm_globals['checkout_coupon_message'] = $info_message;
         
         <!-- GEWIJZIGD: Pas teksten aan -->
         <h4><?php esc_attr_e( 'Activeer je korting', 'oxfam-webshop' ); ?></h4>
-        <p><?php esc_html_e( 'Als je een kortingsbon of digitale cadeaubon hebt, kun je deze hieronder invullen.', 'oxfam-webshop' ); ?></p>
+        <p><?php esc_html_e( 'Als je een digitale cadeaubon hebt, kun je deze hieronder invullen.', 'oxfam-webshop' ); ?></p>
         
         <p class="form-row form-row-first">
             <input type="text" name="coupon_code" class="input-text" placeholder="<?php esc_attr_e( 'Kortingscode', 'oxfam-webshop' ); ?>" id="coupon_code" value="" />
         </p>
 
         <p class="form-row form-row-last">
-            <button type="submit" class="button" name="apply_coupon" value="<?php esc_attr_e( 'Pas kortingsbon toe', 'oxfam-webshop' ); ?>"><?php esc_html_e( 'Pas kortingsbon toe', 'oxfam-webshop' ); ?></button>
+            <button type="submit" class="button" name="apply_coupon" value="<?php esc_attr_e( 'Pas cadeaubon toe', 'oxfam-webshop' ); ?>"><?php esc_html_e( 'Pas cadeaubon toe', 'oxfam-webshop' ); ?></button>
         </p>
 
         <div class="clear"></div>
