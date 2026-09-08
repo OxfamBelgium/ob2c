@@ -4372,6 +4372,7 @@
 				}
 			}
 		} elseif ( in_array( $type, array( 'new_order', 'customer_processing_order', 'customer_refunded_order', 'customer_completed_order', 'customer_note' ) ) ) {
+			// Alle webshopmails archiveren in webshopmailbox (ter controle/ondersteuning)
 			$extra_recipients[] = get_staged_recipients('webshop@oft.be');
 		}
 		

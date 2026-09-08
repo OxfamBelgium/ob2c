@@ -469,7 +469,7 @@
 			if ( wc_terms_and_conditions_page_id() > 0 ) {
 				// Anchor lijkt te werken in alle subsites (omdat de voorwaarden gekopieerd werden van het hoofdniveau)
 				$return_url = get_permalink( wc_terms_and_conditions_page_id() ).'#tab-1494189921569-6-6';
-				$label = '<a href="'.esc_url( $return_url ).'" target="_blank">' . $label . '</a>';
+				$label = '<a href="'.esc_url( $return_url ).'">' . $label . '</a>';
 			}
 			
 			if ( $short_version ) {
