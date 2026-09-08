@@ -37,7 +37,7 @@ if ( $order->has_shipping_method('local_pickup_plus') ) {
 			$clickable_tracking_numbers = '';
 			foreach ( $tracking_info as $index => $tracking_info_details ) {
 				if ( $index === 0 ) {
-					$clickable_tracking_numbers .= '<a href="'.esc_url( $tracking_info_details['link'] ).'" target="_blank">'.$tracking_info_details['number'].'</a>'; 
+					$clickable_tracking_numbers .= '<a href="'.esc_url( $tracking_info_details['link'] ).'" target="_blank">'.$tracking_info_details['number'].'</a>';
 				} else {
 					$clickable_tracking_numbers .= ', <a href="'.esc_url( $tracking_info_details['link'] ).'" target="_blank">'.$tracking_info_details['number'].'</a>';
 				}
@@ -59,6 +59,8 @@ if ( $order->has_shipping_method('local_pickup_plus') ) {
 if ( $additional_content ) {
 	echo wp_kses_post( wpautop( wptexturize( $additional_content ) ) );
 }
+
+echo '<p><i>' . get_return_terms_disclaimer( $order ) . '</i></p>';
 
 /*
  * @hooked WC_Emails::order_details() Shows the order details table.

@@ -306,7 +306,7 @@
 									foreach ( $keys_to_modify as $key_to_modify ) {
 										$locations[ $location_key ][ $key_to_modify ] = str_replace( ' id='.$shop_post_id, ' node='.$shop_post_ids_to_nodes[ $shop_post_id ], $locations[ $location_key ][ $key_to_modify ] );
 									}
-								}	
+								}
 							}
 						}
 					}
@@ -439,6 +439,45 @@
 	
 	function get_company_and_year() {
 		return get_webshop_name().' &copy; 2017-'.date_i18n('Y');
+	}
+	
+	function get_return_terms_disclaimer( $order = false, $short_version = false ) {
+		$base_text = __( 'Oxfam-Wereldwinkels hanteert een retourbeleid van 14 dagen voor producten zonder houdbaarheidsdatum. Wil je binnen die termijn je bestelling annuleren of producten terugzenden, %s.', 'oxfam-webshop' );
+		
+		if ( $order instanceof WC_Order ) {
+			// In dit geval tonen we een maillink met het ordernummer in het onderwerp
+			$label = __( 'hier', 'oxfam-webshop' );
+			
+			$return_url = add_query_arg(
+				array(
+					'subject' => sprintf( __( 'Aanvraag tot retournering van bestelling %s', 'oxfam-webshop' ), $order->get_order_number() ),
+					'body' => 'Ik zou graag volgende producten zonder houdbaarheidsdatum retourneren:',
+				),
+				'mailto:'.get_option('woocommerce_email_from_address')
+			);
+			$label = '<a href="'.esc_url( $return_url ).'" target="_blank">' . $label . '</a>';
+			
+			return sprintf( $base_text, sprintf( __( 'klik dan %s', 'oxfam-webshop' ), $label ) ) . ' ' . __( 'Eén van de vrijwilligers van de webshop waar je je bestelling plaatste, neemt eerstdaags met jou contact om de retour af te handelen.', 'oxfam-webshop' );
+		} else {
+			// In dit geval tonen we een maillink met het ordernummer in het onderwerp
+			$label = __( 'retourbeleid', 'oxfam-webshop' );
+			if ( $short_version ) {
+				// Begin met hoofdletter
+				$label = ucfirst( $label );
+			}
+			
+			if ( wc_terms_and_conditions_page_id() > 0 ) {
+				// Anchor lijkt te werken in alle subsites (omdat de voorwaarden gekopieerd werden van het hoofdniveau)
+				$return_url = get_permalink( wc_terms_and_conditions_page_id() ).'#tab-1494189921569-6-6';
+				$label = '<a href="'.esc_url( $return_url ).'" target="_blank">' . $label . '</a>';
+			}
+			
+			if ( $short_version ) {
+				return $label;
+			} else {
+				return sprintf( $base_text, sprintf( __( 'lees dan ons %s', 'oxfam-webshop' ), $label ) );
+			}
+		}
 	}
 	
 	

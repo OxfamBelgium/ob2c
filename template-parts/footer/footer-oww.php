@@ -162,6 +162,7 @@
 								<?= get_shop_vat_number( $atts ); ?>
 							</p>
 							<p><?= print_telephone( $atts ); ?></p>
+							<p><?= get_return_terms_disclaimer( false, true ); ?></p>
 							<a href="mailto:<?= get_webshop_email(); ?>" class="btn">Contacteer ons</a>
 						<?php endif; ?>
 					</div>

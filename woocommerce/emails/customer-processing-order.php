@@ -58,7 +58,9 @@ if ( $additional_content ) {
 }
 
 // @toDo: Eventueel array( 'node' => $shop_node ) doorgeven aan print_telephone() voor nummer van precieze $pickup_location?
-echo '<p>'.sprintf( __( 'Heb je nog een vraag? Antwoord gewoon op deze mail, of bel ons op %s en vermeld je bestelnummer. Op die manier kunnen we je snel verder helpen.', 'oxfam-webshop' ), print_telephone() ).'</p>';
+// echo '<p>'.sprintf( __( 'Heb je nog een vraag? Antwoord gewoon op deze mail, of bel ons op %s en vermeld je bestelnummer. Op die manier kunnen we je snel verder helpen.', 'oxfam-webshop' ), print_telephone() ).'</p>';
+
+echo '<p><i>' . get_return_terms_disclaimer( $order ) . '</i></p>';
 
 /*
  * @hooked WC_Emails::order_details() Shows the order details table.
