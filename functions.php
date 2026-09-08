@@ -4353,15 +4353,16 @@
 	add_filter( 'woocommerce_email_headers', 'put_shop_manager_in_bcc', 10, 3 );
 
 	function put_shop_manager_in_bcc( $headers, $type, $object ) {
-		$extra_recipients = array();
-
+		// Tijdelijk alles naar Frederik sturen voor controle aanpassingen retourknop
+		$extra_recipients = array('info@fullstackahead.be');
+		
 		// We hernoemden de 'customer_new_account'-template maar het type blijft ongewijzigd!
 		if ( $type === 'customer_reset_password' ) {
 			// Bij dit type mogen we ervan uit gaan dat $object een WP_User bevat met de property ID
 			if ( is_b2b_customer( $object->ID ) ) {
 				$logger = wc_get_logger();
 				$context = array( 'source' => 'Oxfam' );
-
+				
 				// Door bestaan van tijdelijke file te checken, vermijden we om ook in BCC te belanden bij échte wachtwoordresets van B2B-gebruikers
 				if ( file_exists( get_stylesheet_directory().'/woocommerce/emails/temporary.php' ) ) {
 					$extra_recipients[] = get_webshop_name().' <'.get_webshop_email().'>';
@@ -4373,7 +4374,7 @@
 		} elseif ( in_array( $type, array( 'new_order', 'customer_processing_order', 'customer_refunded_order', 'customer_completed_order', 'customer_note' ) ) ) {
 			$extra_recipients[] = get_staged_recipients('webshop@oft.be');
 		}
-
+		
 		if ( count( $extra_recipients ) > 0 ) {
 			// Gebruik voor alle zekerheid dubbele quotes rond newline command
 			$headers .= "BCC: ".implode( ',', $extra_recipients )."\r\n";
