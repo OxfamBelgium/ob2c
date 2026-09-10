@@ -4353,8 +4353,7 @@
 	add_filter( 'woocommerce_email_headers', 'put_shop_manager_in_bcc', 10, 3 );
 
 	function put_shop_manager_in_bcc( $headers, $type, $object ) {
-		// Tijdelijk alles naar Frederik sturen voor controle aanpassingen retourknop
-		$extra_recipients = array('info@fullstackahead.be');
+		$extra_recipients = array();
 		
 		// We hernoemden de 'customer_new_account'-template maar het type blijft ongewijzigd!
 		if ( $type === 'customer_reset_password' ) {
