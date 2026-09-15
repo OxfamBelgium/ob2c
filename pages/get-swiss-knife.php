@@ -101,7 +101,7 @@
 			
 			$args = array(
 				'type' => 'shop_order',
-				'status' => array('wc-completed'),
+				'status' => array( 'wc-processing', 'wc-claimed', 'wc-completed' ),
 				'date_created' => $start_date.'...'.$end_date,
 				'limit' => -1,
 			);
@@ -182,7 +182,7 @@
 			}
 			echo '</ul>';
 		} else {
-			echo '<p><i>Geen recente orders met kortingsbonnen.</i></p>'; 
+			echo '<p><i>Geen recente orders met kortingsbonnen.</i></p>';
 		}
 	}
 ?>
