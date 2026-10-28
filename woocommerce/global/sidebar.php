@@ -26,15 +26,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 				<?php
 					$products_tags = array();
 					
-					// $args = array(
-					// 	'stock_status' => 'instock',
-					// 	'include' => wc_get_product_ids_on_sale(),
-					// );
-					// $sale_products = wc_get_products( $args );
-					// if ( count( $sale_products ) > 0 ) {
-					// 	$products_tags[] = 'promotie';
-					// }
-					
+					if ( count( get_products_that_are_actually_on_sale() ) > 0 ) {
+						$products_tags[] = 'promotie';
+					}
 					// $products_tags[] = 'pasen';
 					$products_tags[] = 'sinterklaas';
 					

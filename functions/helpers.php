@@ -568,6 +568,30 @@
 		return ( strpos( $shopplus, 'M' ) === 0 );
 	}
 	
+	function get_products_that_are_actually_on_sale() {
+		$sale_products = array();
+		
+		// Functie werkt met een transient cache, waarbij toekomstige promo's ook al opgenomen zijn
+		if ( count( wc_get_product_ids_on_sale() ) > 0 ) {
+			// Filter nogmaals op 'vandaag in promo' én check of ze bestelbaar zijn
+			$args = array(
+				'stock_status' => 'instock',
+				'include' => wc_get_product_ids_on_sale(),
+				'date_on_sale_to' => '>='.wp_date('Y-m-d'),
+			);
+			
+			// Filter enkel inschakelen vòòr start van wijnfestival
+			if ( wp_date('Y-m-d') < '2026-11-01' ) {
+				// Opgelet: wordt blanco na start van promo
+				$args['date_on_sale_from'] = '<='.wp_date('Y-m-d');
+			}
+			
+			$sale_products = wc_get_products( $args );
+		}
+		
+		return $sale_products;
+	}
+	
 	
 	
 	#############

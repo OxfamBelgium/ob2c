@@ -91,45 +91,29 @@
 				?>
 				
 				<?php
-					if ( count( wc_get_product_ids_on_sale() ) > 0 ) {
-						// wc_get_product_ids_on_sale() werkt met een transient cache, waarbij toekomstige promo's ook al opgenomen zijn
-						// Filter daarom nogmaals op 'vandaag in promo' én check of ze bestelbaar zijn
-						$args = array(
-							'stock_status' => 'instock',
-							'include' => wc_get_product_ids_on_sale(),
-							'date_on_sale_to' => '>='.wp_date('Y-m-d'),
-						);
-						// Filter enkel inschakelen vòòr start van wijnfestival
-						if ( wp_date('Y-m-d') < '2026-11-01' ) {
-							// Opgelet: wordt blanco na start van promo
-							$args['date_on_sale_from'] = '<='.wp_date('Y-m-d');
+					if ( count( get_products_that_are_actually_on_sale() ) > 0 ) {
+						$term = get_term_by( 'slug', 'promotie', 'product_tag' );
+						if ( $term !== false ) {
+							$term_link = get_term_link( $term );
+							$url = $term_link.'#nm-shop-products';
+						} else {
+							$url = get_permalink( wc_get_page_id('shop') );
 						}
-						$sale_products = wc_get_products( $args );
-						
-						if ( count( $sale_products ) > 0 ) {
-							$term = get_term_by( 'slug', 'promotie', 'product_tag' );
-							if ( $term !== false ) {
-								$term_link = get_term_link( $term );
-								$url = $term_link.'#nm-shop-products';
-							} else {
-								$url = get_permalink( wc_get_page_id('shop') );
-							}
-							?>
-							<div class="col-row lh-header">
-								<div class="col-xs-12 col-sm-6">
-									<h2>Promoties</h2>
-								</div>
-								<div class="col-xs-12 col-sm-6">
-									<a href="<?= esc_url( $url ); ?>">Alle promoties</a>
-								</div>
+						?>
+						<div class="col-row lh-header">
+							<div class="col-xs-12 col-sm-6">
+								<h2>Promoties</h2>
 							</div>
-							<div class="col-row lh-promo">
-								<div class="col-xs-12">
-									<?= do_shortcode('[nm_product_slider shortcode="sale_products" per_page="-1" columns="4" columns_mobile="1" orderby="menu_order" order="ASC" arrows="1"]'); ?>
-								</div>
+							<div class="col-xs-12 col-sm-6">
+								<a href="<?= esc_url( $url ); ?>">Alle promoties</a>
 							</div>
-							<?php
-						}
+						</div>
+						<div class="col-row lh-promo">
+							<div class="col-xs-12">
+								<?= do_shortcode('[nm_product_slider shortcode="sale_products" per_page="-1" columns="4" columns_mobile="1" orderby="menu_order" order="ASC" arrows="1"]'); ?>
+							</div>
+						</div>
+						<?php
 					}
 				?>
 			</div>
