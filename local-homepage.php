@@ -97,10 +97,13 @@
 						$args = array(
 							'stock_status' => 'instock',
 							'include' => wc_get_product_ids_on_sale(),
-							// Opgelet: wordt blanco na start van de promoperiode, filter dan weer uitschakelen
-							'date_on_sale_from' => '<='.date_i18n('Y-m-d'),
-							'date_on_sale_to' => '>='.date_i18n('Y-m-d'),
+							'date_on_sale_to' => '>='.wp_date('Y-m-d'),
 						);
+						// Filter enkel inschakelen vòòr start van wijnfestival
+						if ( wp_date('Y-m-d') < '2026-11-01' ) {
+							// Opgelet: wordt blanco na start van promo
+							$args['date_on_sale_from'] = '<='.wp_date('Y-m-d');
+						}
 						$sale_products = wc_get_products( $args );
 						
 						if ( count( $sale_products ) > 0 ) {
