@@ -213,7 +213,8 @@
 			<div class="col-sm-8 md-align-self-center">
 				<p>Oxfam-Wereldwinkels vzw &copy; 2019-<?= date_i18n('Y'); ?>. Alle rechten voorbehouden.<br/>
 				Oxfam-Wereldwinkels/Fair Trade en Oxfam-Solidariteit bundelen de krachten onder de naam Oxfam België.<br/>
-				<a href="https://oxfambelgie.be/privacy" target="_blank">Privacybeleid</a> / <a href="https://oxfambelgie.be/cookiebeleid" target="_blank">Cookiebeleid</a></p>
+				<a href="https://oxfambelgie.be/privacy" target="_blank">Privacybeleid</a> / <a href="https://oxfambelgie.be/cookiebeleid" target="_blank">Cookiebeleid</a> / <a href="#cookie-settings">Cookie-instellingen</a>
+				</p>
 			</div>
 			<div class="col-sm-4 md-align-self-center alcohol-warning">
 				<a href="https://www.vlaanderen.be/regels-voor-verkoop-van-alcohol" target="_blank"><img width="250" src="<?= get_stylesheet_directory_uri() . '/images/geen-alcohol-minderjarigen.jpg'; ?>" class="attachment-medium size-medium" alt="Geen verkoop van alcohol aan minderjarigen"></a>
