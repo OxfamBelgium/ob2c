@@ -7782,7 +7782,7 @@
 		} else {
 			switch ( $key ) {
 				case 'place':
-					return 'Ververijstraat 17';
+					return 'Moutstraat 60 bus 302';
 				case 'zipcode':
 					return '9000';
 				case 'city':

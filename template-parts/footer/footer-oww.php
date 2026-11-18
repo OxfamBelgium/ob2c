@@ -148,7 +148,7 @@
 						<h3>Contact</h3>
 						<?php if ( is_main_site() ) : ?>
 							<p>
-								Ververijstraat 17<br/>
+								Moutstraat 60 bus 302<br/>
 								B-9000 Gent<br/>
 								BE 0415.365.777<br/>
 								RPR GENT
