@@ -27,7 +27,7 @@
 		// Zoek vervolgens de details van de actie op
 		// Handmatig beheerde lijst, want simpeler dan afleiden uit de kortingsregels!
 		
-		$wijnfestival_products = array( 20211, 20225, 20262, 20067, 20068, 20074, 20413, 20415 );
+		$wijnfestival_products = array( 20212, 20261, 20262, 20032, 20067, 20078, 20415, 20418 );
 		if ( in_array( $product->get_sku(), $wijnfestival_products ) ) {
 			$labels['promotion'] = '-15% per 2 flessen';
 		}
